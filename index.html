@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Morning ☀️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            min-height: 100vh;
+            background: #0a0a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: var(--brightness); }
+        }
+
+        .sunrise {
+            position: fixed;
+            bottom: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200%;
+            height: 100%;
+            background: radial-gradient(ellipse at center bottom, 
+                rgba(255, 154, 100, 0.15) 0%, 
+                rgba(255, 120, 150, 0.08) 30%, 
+                rgba(100, 100, 200, 0.03) 60%, 
+                transparent 80%);
+            animation: sunrise 8s ease-out forwards;
+            z-index: 0;
+        }
+
+        @keyframes sunrise {
+            0% { opacity: 0; bottom: -60%; }
+            100% { opacity: 1; bottom: -30%; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            animation: fadeUp 2s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .greeting {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            animation: fadeUp 2s ease-out 0.5s both;
+        }
+
+        .name {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffd4e8, #ffb4d4, #ff94c4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            animation: fadeUp 2s ease-out 1s both;
+        }
+
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,180,212,0.5), transparent);
+            margin: 0 auto 2rem;
+            animation: fadeUp 2s ease-out 1.3s both;
+        }
+
+        .message {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 2;
+            margin-bottom: 2.5rem;
+            animation: fadeUp 2s ease-out 1.5s both;
+        }
+
+        .reasons {
+            text-align: left;
+            max-width: 420px;
+            margin: 0 auto 2.5rem;
+            animation: fadeUp 2s ease-out 2s both;
+        }
+
+        .reason {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            opacity: 0;
+            animation: reasonFade 1s ease-out forwards;
+        }
+
+        .reason:nth-child(1) { animation-delay: 2.5s; }
+        .reason:nth-child(2) { animation-delay: 3.2s; }
+        .reason:nth-child(3) { animation-delay: 3.9s; }
+        .reason:nth-child(4) { animation-delay: 4.6s; }
+        .reason:nth-child(5) { animation-delay: 5.3s; }
+
+        @keyframes reasonFade {
+            0% { opacity: 0; transform: translateX(-10px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        .reason-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .reason-text {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .reason-text strong {
+            color: rgba(255, 200, 220, 0.9);
+            font-weight: 400;
+        }
+
+        .countdown {
+            margin-top: 1rem;
+            padding: 1.2rem 2rem;
+            background: rgba(255, 180, 212, 0.06);
+            border: 1px solid rgba(255, 180, 212, 0.12);
+            border-radius: 16px;
+            display: inline-block;
+            animation: fadeUp 2s ease-out 6s both;
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255, 180, 212, 0.5);
+            margin-bottom: 0.5rem;
+        }
+
+        .countdown-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: #ffb4d4;
+        }
+
+        .countdown-unit {
+            font-size: 0.85rem;
+            color: rgba(255, 180, 212, 0.6);
+            font-weight: 300;
+        }
+
+        .footer {
+            margin-top: 2.5rem;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.3);
+            animation: fadeUp 2s ease-out 6.5s both;
+        }
+
+        .heart-float {
+            position: fixed;
+            font-size: 1rem;
+            opacity: 0;
+            animation: floatUp 6s ease-out forwards;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(0) scale(0.5); }
+            15% { opacity: 0.6; }
+            100% { opacity: 0; transform: translateY(-100vh) scale(1.2) rotate(20deg); }
+        }
+
+        @media (max-width: 600px) {
+            .greeting { font-size: 2rem; }
+            .name { font-size: 2.8rem; }
+            .message { font-size: 1rem; }
+            .container { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="sunrise"></div>
+
+    <div class="container">
+        <div class="greeting">Good Morning,</div>
+        <div class="name">Erica</div>
+        <div class="divider"></div>
+        
+        <div class="message">
+            I know it's early and you're probably still half asleep,<br>
+            but I wanted the first thing you see today<br>
+            to be a reminder of how loved you are.
+        </div>
+
+        <div class="reasons">
+            <div class="reason">
+                <span class="reason-icon">☀️</span>
+                <span class="reason-text">I love the way you <strong>laugh at your own jokes</strong> before you even finish telling them</span>
+            </div>
+            <div class="reason">
+                <span class="reason-icon">🌸</span>
+                <span class="reason-text">I love how you <strong>always check on me</strong> even when you're the one having a hard day</span>
+            </div>
+            <div class="reason">
+                <span class="reason-icon">✨</span>
+                <span class="reason-text">I love that <strong>9,000 kilometers</strong> between us has never once made me doubt this</span>
+            </div>
+            <div class="reason">
+                <span class="reason-icon">🐱</span>
+                <span class="reason-text">I love seeing you with your cat and knowing that's <strong>the softest version of you</strong> — and I get to see it too</span>
+            </div>
+            <div class="reason">
+                <span class="reason-icon">💕</span>
+                <span class="reason-text">I love that <strong>every single day</strong> I wake up more sure about us than the day before</span>
+            </div>
+        </div>
+
+        <div class="countdown">
+            <div class="countdown-label">Until I'm holding you again</div>
+            <div class="countdown-number" id="days"></div>
+        </div>
+
+        <div class="footer">
+            — Your person, from across the world 🇸🇪💕🇺🇸
+        </div>
+    </div>
+
+    <script>
+        // Stars
+        const starsEl = document.getElementById('stars');
+        for (let i = 0; i < 120; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 70 + '%';
+            star.style.setProperty('--duration', (2 + Math.random() * 4) + 's');
+            star.style.setProperty('--brightness', (0.3 + Math.random() * 0.7));
+            star.style.animationDelay = Math.random() * 5 + 's';
+            starsEl.appendChild(star);
+        }
+
+        // Countdown to April 9, 2026
+        const target = new Date('2026-04-09T00:00:00-07:00'); // San Diego time
+        function updateCountdown() {
+            const now = new Date();
+            const diff = target - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById('days').innerHTML = 
+                `${days} <span class="countdown-unit">days</span> ${hours} <span class="countdown-unit">hours</span>`;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 60000);
+
+        // Floating hearts
+        function spawnHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-float';
+            heart.textContent = ['💕', '💗', '✨', '🤍', '💫'][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.bottom = '-20px';
+            heart.style.animationDelay = '0s';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 6000);
+        }
+        setInterval(spawnHeart, 2000);
+        setTimeout(spawnHeart, 3000);
+    </script>
+</body>
+</html>
