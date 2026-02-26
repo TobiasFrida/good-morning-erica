@@ -65,8 +65,8 @@
   }
 
   /* CONTENT */
-  .content { display: none; }
-  .content.show { display: block; }
+  .content { opacity: 0; pointer-events: none; }
+  .content.show { opacity: 1; pointer-events: auto; transition: opacity 1s ease; }
 
   /* HERO */
   .hero-emoji { font-size: 3rem; margin-bottom: 20px; animation: bob 3s ease infinite; }
@@ -431,11 +431,17 @@
 
   // Open
   function openSurprise(){
-    document.getElementById('envelope').classList.add('gone');
-    const c=document.getElementById('content');
-    c.classList.add('show');
-    setTimeout(()=>document.getElementById('scrollHint').classList.add('show'),2000);
-    startObs();
+    const env = document.getElementById('envelope');
+    env.style.transition = 'opacity 0.8s ease';
+    env.style.opacity = '0';
+    setTimeout(()=>{
+      env.style.display = 'none';
+      const c=document.getElementById('content');
+      c.classList.add('show');
+      window.scrollTo(0,0);
+      setTimeout(()=>document.getElementById('scrollHint').classList.add('show'),2000);
+      startObs();
+    }, 800);
   }
 
   // Scroll observer
