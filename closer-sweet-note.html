@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💌 A Sweet Note For You</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0f;
+    min-height: 100vh;
+    display: flex; justify-content: center; align-items: center;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  /* PARTICLES */
+  .particle {
+    position: fixed; pointer-events: none; z-index: 0;
+    opacity: 0; animation: drift 12s linear infinite;
+  }
+  @keyframes drift {
+    0% { transform: translateY(105vh) rotate(0deg); opacity: 0; }
+    8% { opacity: 0.25; }
+    92% { opacity: 0.08; }
+    100% { transform: translateY(-5vh) rotate(180deg); opacity: 0; }
+  }
+
+  /* ENVELOPE STATE */
+  .envelope-wrap {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 10; cursor: pointer;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  .envelope-wrap.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+  .envelope-icon {
+    font-size: 4rem;
+    animation: bob 2.5s ease infinite;
+    filter: drop-shadow(0 0 20px rgba(255,107,138,0.3));
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-8px) rotate(2deg); }
+  }
+  .envelope-label {
+    margin-top: 18px; font-size: 0.8rem; color: #555;
+    letter-spacing: 3px; text-transform: uppercase;
+    animation: softPulse 2.5s ease infinite;
+  }
+  @keyframes softPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* NOTE CARD */
+  .note-card {
+    position: relative; z-index: 5;
+    max-width: 420px; width: 90%; padding: 50px 35px 40px;
+    background: linear-gradient(145deg, #131318, #16141f);
+    border: 1px solid rgba(255,107,138,0.12);
+    border-radius: 16px;
+    box-shadow: 0 0 60px rgba(255,107,138,0.06), 0 20px 60px rgba(0,0,0,0.4);
+    opacity: 0; transform: scale(0.9) translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  .note-card.visible {
+    opacity: 1; transform: scale(1) translateY(0);
+  }
+
+  .note-to {
+    font-size: 0.7rem; color: #555; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 30px; text-align: center;
+  }
+
+  .note-body {
+    font-family: 'Caveat', cursive;
+    font-size: 1.6rem; line-height: 1.9;
+    color: #e8ddd0;
+    text-align: center;
+  }
+  .note-body .line {
+    display: block; opacity: 0; transform: translateY(10px);
+  }
+  .note-body .heart-word {
+    color: #ff6b8a;
+    text-shadow: 0 0 20px rgba(255,107,138,0.25);
+  }
+
+  .note-divider {
+    width: 40px; height: 1px; margin: 30px auto;
+    background: linear-gradient(90deg, transparent, #ff6b8a55, transparent);
+  }
+
+  .note-from {
+    text-align: center; font-size: 0.8rem; color: #555;
+    letter-spacing: 2px;
+  }
+  .note-from span {
+    font-family: 'Caveat', cursive;
+    font-size: 1.4rem; color: #b8a898;
+    display: block; margin-top: 5px;
+  }
+
+  /* CLOSER BADGE */
+  .badge {
+    position: fixed; bottom: 14px; right: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 0.65rem; color: #444; letter-spacing: 1px;
+    z-index: 20; backdrop-filter: blur(8px);
+  }
+  .badge i { color: #ff6b8a; font-style: normal; }
+
+  /* TIER LABEL */
+  .tier {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    font-size: 0.65rem; color: #444; letter-spacing: 3px;
+    text-transform: uppercase; z-index: 20;
+  }
+
+  /* CLICK SPARKLE */
+  .sparkle {
+    position: fixed; pointer-events: none; z-index: 30;
+    font-size: 16px;
+    animation: pop 0.5s ease forwards;
+  }
+  @keyframes pop {
+    0% { transform: scale(0) translateY(0); opacity: 1; }
+    100% { transform: scale(1.2) translateY(-20px); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="tier">💌 sweet note</div>
+
+<!-- ENVELOPE -->
+<div class="envelope-wrap" id="envelope" onclick="openNote()">
+  <div class="envelope-icon">💌</div>
+  <div class="envelope-label">tap to open</div>
+</div>
+
+<!-- NOTE -->
+<div class="note-card" id="noteCard">
+  <div class="note-to">a note for erica</div>
+  <div class="note-body" id="noteBody">
+    <span class="line">Hey you,</span>
+    <span class="line">&nbsp;</span>
+    <span class="line">I just wanted to say</span>
+    <span class="line">you're the <span class="heart-word">best thing</span></span>
+    <span class="line">that ever happened to me.</span>
+    <span class="line">&nbsp;</span>
+    <span class="line">9 hours apart and you still</span>
+    <span class="line">make every single day <span class="heart-word">better.</span></span>
+    <span class="line">&nbsp;</span>
+    <span class="line">I can't wait to hold you again.</span>
+    <span class="line">&nbsp;</span>
+    <span class="line"><span class="heart-word">I love you.</span> Always.</span>
+  </div>
+  <div class="note-divider"></div>
+  <div class="note-from">with love,<span>Tobias ❤️</span></div>
+</div>
+
+<div class="badge">made with <i>♥</i> on Closer</div>
+
+<script>
+  // Particles
+  const emojis = ['✨', '💕', '🤍', '💫'];
+  function spawn() {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (8 + Math.random() * 8) + 's';
+    p.style.animationDelay = Math.random() * 4 + 's';
+    p.style.fontSize = (10 + Math.random() * 10) + 'px';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 20000);
+  }
+  setInterval(spawn, 1200);
+
+  // Click sparkles
+  document.addEventListener('click', e => {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.textContent = ['✨','💖','💫'][Math.floor(Math.random()*3)];
+    s.style.left = (e.clientX - 8) + 'px';
+    s.style.top = (e.clientY - 8) + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 500);
+  });
+
+  // Open
+  function openNote() {
+    document.getElementById('envelope').classList.add('gone');
+    const card = document.getElementById('noteCard');
+    setTimeout(() => {
+      card.classList.add('visible');
+      // Animate lines
+      const lines = document.querySelectorAll('#noteBody .line');
+      lines.forEach((line, i) => {
+        setTimeout(() => {
+          line.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+          line.style.opacity = '1';
+          line.style.transform = 'translateY(0)';
+        }, 300 + i * 250);
+      });
+    }, 400);
+  }
+</script>
+</body>
+</html>
