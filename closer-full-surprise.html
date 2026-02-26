@@ -268,7 +268,7 @@
 
 <div class="tier">🎨 full surprise</div>
 
-<div class="envelope-wrap" id="envelope" onclick="open()">
+<div class="envelope-wrap" id="envelope" onclick="openSurprise()">
   <div class="envelope-icon">🎨</div>
   <div class="envelope-label">tap to unwrap your surprise</div>
 </div>
@@ -430,7 +430,7 @@
   }
 
   // Open
-  function open(){
+  function openSurprise(){
     document.getElementById('envelope').classList.add('gone');
     const c=document.getElementById('content');
     c.classList.add('show');
