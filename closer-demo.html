@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💌 A Surprise For You</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    background: #0a0a0f;
+    color: #e8e0d4;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* PRELOADER */
+  .preloader {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #0a0a0f; z-index: 1000;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+  .preloader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .preloader-heart {
+    font-size: 3rem;
+    animation: heartbeat 1s ease infinite;
+  }
+  .preloader-text {
+    margin-top: 20px; font-size: 0.9rem; color: #666;
+    font-style: italic; letter-spacing: 2px;
+  }
+  .preloader-bar {
+    width: 200px; height: 2px; background: #1a1a2e; margin-top: 20px;
+    border-radius: 2px; overflow: hidden;
+  }
+  .preloader-fill {
+    height: 100%; width: 0%; background: linear-gradient(90deg, #ff6b8a, #c084fc);
+    animation: loadBar 3s ease forwards;
+  }
+  @keyframes loadBar { to { width: 100%; } }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  /* FLOATING PARTICLES */
+  .particle {
+    position: fixed; pointer-events: none; z-index: 1;
+    opacity: 0; font-size: 14px;
+    animation: floatParticle 15s linear infinite;
+  }
+  @keyframes floatParticle {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    5% { opacity: 0.3; }
+    95% { opacity: 0.1; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* SECTIONS */
+  .section {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; padding: 60px 20px;
+    position: relative; z-index: 2;
+  }
+
+  /* OPENER */
+  .opener { cursor: pointer; }
+  .opener-envelope {
+    font-size: 5rem; transition: transform 0.5s ease;
+    animation: gentleFloat 3s ease infinite;
+  }
+  .opener:hover .opener-envelope { transform: scale(1.1) rotate(5deg); }
+  .opener-text {
+    margin-top: 20px; font-size: 1rem; color: #666;
+    letter-spacing: 3px; text-transform: uppercase;
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes gentleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* CONTENT (hidden until opened) */
+  .content { display: none; }
+  .content.visible { display: block; }
+
+  /* HERO */
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 700; text-align: center;
+    background: linear-gradient(135deg, #ff6b8a, #c084fc, #60a5fa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    opacity: 0; animation: fadeSlideUp 1.5s ease forwards;
+    line-height: 1.2;
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 3vw, 1.3rem); color: #888;
+    margin-top: 15px; font-style: italic; text-align: center;
+    opacity: 0; animation: fadeSlideUp 1.5s ease 0.5s forwards;
+    font-family: 'Playfair Display', serif;
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* DIVIDER */
+  .divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, #ff6b8a, transparent);
+    margin: 40px auto;
+  }
+
+  /* LETTER */
+  .letter-section { background: linear-gradient(180deg, #0a0a0f 0%, #0f0a1a 100%); }
+  .letter {
+    max-width: 600px; margin: 0 auto;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem; line-height: 2.2;
+    color: #d4c8b8; text-align: center;
+  }
+  .letter p { margin: 25px 0; opacity: 0; transform: translateY(20px); }
+  .letter .highlight {
+    color: #ff6b8a; font-style: italic;
+    text-shadow: 0 0 30px rgba(255,107,138,0.2);
+  }
+
+  /* TIMELINE */
+  .timeline-section { background: linear-gradient(180deg, #0f0a1a 0%, #0a0f1a 100%); }
+  .timeline-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; text-align: center; margin-bottom: 50px;
+    color: #c084fc;
+  }
+  .timeline {
+    position: relative; max-width: 500px; margin: 0 auto;
+    padding-left: 40px;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 15px; top: 0;
+    width: 2px; height: 100%;
+    background: linear-gradient(180deg, #c084fc, #60a5fa, #ff6b8a);
+  }
+  .timeline-item {
+    position: relative; margin-bottom: 40px;
+    opacity: 0; transform: translateX(-20px);
+  }
+  .timeline-dot {
+    position: absolute; left: -33px; top: 5px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #c084fc; box-shadow: 0 0 15px rgba(192,132,252,0.5);
+  }
+  .timeline-date {
+    font-size: 0.8rem; color: #c084fc; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 5px;
+  }
+  .timeline-text {
+    font-size: 1rem; color: #b8b0a4; line-height: 1.6;
+  }
+  .timeline-emoji { font-size: 1.5rem; margin-bottom: 5px; }
+
+  /* COUNTER */
+  .counter-section {
+    background: linear-gradient(180deg, #0a0f1a 0%, #0a0a0f 100%);
+    text-align: center;
+  }
+  .counter-label {
+    font-size: 0.9rem; color: #666; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 20px;
+  }
+  .counter-number {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 10vw, 6rem); font-weight: 700;
+    background: linear-gradient(135deg, #ff6b8a, #c084fc);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .counter-unit {
+    font-size: 1.2rem; color: #888; margin-top: 10px;
+    font-family: 'Playfair Display', serif; font-style: italic;
+  }
+  .counter-sub {
+    font-size: 0.85rem; color: #555; margin-top: 30px;
+  }
+
+  /* REASONS */
+  .reasons-section { background: linear-gradient(180deg, #0a0a0f 0%, #0f0a1a 100%); }
+  .reasons-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; text-align: center; margin-bottom: 40px;
+    color: #60a5fa;
+  }
+  .reason {
+    max-width: 500px; margin: 0 auto 30px;
+    padding: 20px 25px; border-left: 2px solid #60a5fa33;
+    opacity: 0; transform: translateY(20px);
+  }
+  .reason-number {
+    font-size: 0.75rem; color: #60a5fa; letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  .reason-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; color: #c8c0b4; line-height: 1.8;
+  }
+
+  /* PROMISE */
+  .promise-section {
+    background: linear-gradient(180deg, #0f0a1a 0%, #0a0a0f 100%);
+    text-align: center;
+  }
+  .promise-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    line-height: 1.8; max-width: 600px; margin: 0 auto;
+    color: #e8e0d4;
+    opacity: 0; transform: translateY(20px);
+  }
+  .promise-text .glow {
+    color: #ff6b8a;
+    text-shadow: 0 0 40px rgba(255,107,138,0.3);
+  }
+
+  /* FINALE */
+  .finale-section {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center;
+  }
+  .finale-heart {
+    font-size: 4rem; margin-bottom: 30px;
+    animation: heartbeat 1.5s ease infinite;
+  }
+  .finale-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; color: #888; font-style: italic;
+  }
+  .finale-from {
+    margin-top: 30px; font-size: 1rem; color: #555;
+    letter-spacing: 3px; text-transform: uppercase;
+  }
+
+  /* CLOSER BRANDING */
+  .closer-badge {
+    position: fixed; bottom: 15px; right: 15px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 16px; border-radius: 20px; z-index: 100;
+    font-size: 0.75rem; color: #555; letter-spacing: 1px;
+    backdrop-filter: blur(10px);
+  }
+  .closer-badge span { color: #ff6b8a; }
+
+  /* COLLECTIBLE DROP */
+  .drop-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); z-index: 2000;
+    display: none; justify-content: center; align-items: center;
+    flex-direction: column; cursor: pointer;
+  }
+  .drop-overlay.visible { display: flex; }
+  .drop-rarity {
+    font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase;
+    margin-bottom: 20px; animation: fadeSlideUp 0.5s ease forwards;
+  }
+  .drop-rarity.rare { color: #fbbf24; }
+  .drop-item {
+    font-size: 6rem;
+    animation: dropReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .drop-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; color: #fbbf24; margin-top: 20px;
+    animation: fadeSlideUp 0.5s ease 0.3s forwards; opacity: 0;
+  }
+  .drop-desc {
+    font-size: 0.85rem; color: #666; margin-top: 10px;
+    animation: fadeSlideUp 0.5s ease 0.5s forwards; opacity: 0;
+  }
+  .drop-dismiss {
+    font-size: 0.75rem; color: #444; margin-top: 40px;
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes dropReveal {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .drop-sparkles {
+    position: absolute; width: 200px; height: 200px;
+    pointer-events: none;
+  }
+  .drop-sparkle {
+    position: absolute; font-size: 16px;
+    animation: sparkleOut 1s ease forwards;
+  }
+  @keyframes sparkleOut {
+    0% { transform: translate(0, 0) scale(0); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+  }
+
+  /* CLICK SPARKLE */
+  .click-sparkle {
+    position: fixed; pointer-events: none; z-index: 50;
+    font-size: 20px;
+    animation: clickPop 0.6s ease forwards;
+  }
+  @keyframes clickPop {
+    0% { transform: scale(0) translateY(0); opacity: 1; }
+    100% { transform: scale(1) translateY(-30px); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div class="preloader" id="preloader">
+  <div class="preloader-heart">💌</div>
+  <div class="preloader-text">someone made this for you</div>
+  <div class="preloader-bar"><div class="preloader-fill"></div></div>
+</div>
+
+<!-- OPENER -->
+<div class="section opener" id="opener" onclick="openSurprise()">
+  <div class="opener-envelope">💌</div>
+  <div class="opener-text">tap to open your surprise</div>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="content">
+
+  <!-- HERO -->
+  <div class="section">
+    <div class="hero-title">Erica,<br>This Is For You</div>
+    <div class="hero-sub">from the guy 4,832 miles away who can't stop thinking about you</div>
+  </div>
+
+  <!-- LETTER -->
+  <div class="section letter-section">
+    <div class="divider"></div>
+    <div class="letter" id="letter">
+      <p>I know the distance is hard sometimes.</p>
+      <p>9 hours apart. Different sunsets. Different mornings.</p>
+      <p>But every single day, you make it <span class="highlight">worth it.</span></p>
+      <p>You're the first thing I think about when I wake up in Umeå, and the last voice I hear before I fall asleep.</p>
+      <p>You make me want to be <span class="highlight">better.</span> Build things. Dream bigger. Cross oceans.</p>
+      <p>And I promise you — <span class="highlight">this distance has an expiration date.</span></p>
+    </div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="section timeline-section">
+    <div class="timeline-title">Our Story So Far</div>
+    <div class="timeline" id="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-emoji">💬</div>
+        <div class="timeline-date">August 2025</div>
+        <div class="timeline-text">The first message. The one that changed everything.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-emoji">🌺</div>
+        <div class="timeline-date">First Meeting</div>
+        <div class="timeline-text">Hawaii. When I saw you in person and knew this was real.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-emoji">🏠</div>
+        <div class="timeline-date">Second Visit</div>
+        <div class="timeline-text">San Diego. Your world. Kiru judging me from the kitchen floor.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-emoji">💡</div>
+        <div class="timeline-date">February 2026</div>
+        <div class="timeline-text">We started building Closer together. Our app. Our dream. Our future.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-emoji">🌸</div>
+        <div class="timeline-date">March 2027</div>
+        <div class="timeline-text">Japan. Cherry blossoms. Together.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-emoji">🏮</div>
+        <div class="timeline-date">November 2027</div>
+        <div class="timeline-text">Yi Peng. Thousands of lanterns. One wish. You.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-emoji">♾️</div>
+        <div class="timeline-date">The Future</div>
+        <div class="timeline-text">Same city. Same home. Same sunrise. Finally.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNTER -->
+  <div class="section counter-section">
+    <div class="counter-label">We have been together for</div>
+    <div class="counter-number" id="dayCounter">0</div>
+    <div class="counter-unit">days</div>
+    <div class="counter-sub" id="counterSub"></div>
+  </div>
+
+  <!-- REASONS -->
+  <div class="section reasons-section">
+    <div class="reasons-title">Reasons I Love You</div>
+    <div id="reasons">
+      <div class="reason">
+        <div class="reason-number">01</div>
+        <div class="reason-text">The way you laugh when Kiru does something ridiculous. It's my favorite sound in the world.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-number">02</div>
+        <div class="reason-text">How you push me to dream bigger. Closer was your idea. Our future is because of your vision.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-number">03</div>
+        <div class="reason-text">You're the most competitive Rocket League player I know. And you somehow have 700 people in your Discord. That's terrifying and impressive.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-number">04</div>
+        <div class="reason-text">The way you say "bro" to literally everyone, including our AI assistants.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-number">05</div>
+        <div class="reason-text">You make 4,832 miles feel like nothing. Every call, every text, every late night — you make it easy to love you across an ocean.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMISE -->
+  <div class="section promise-section">
+    <div class="promise-text" id="promise">
+      I don't know exactly when the distance ends.<br><br>
+      But I know it <span class="glow">will.</span><br><br>
+      And when it does, I'm never letting go.
+    </div>
+  </div>
+
+  <!-- FINALE -->
+  <div class="section finale-section">
+    <div class="finale-heart">❤️</div>
+    <div class="finale-text">I love you, Erica.</div>
+    <div class="finale-from">— Tobias</div>
+  </div>
+
+</div>
+
+<!-- CLOSER BADGE -->
+<div class="closer-badge">made with <span>♥</span> on Closer</div>
+
+<!-- COLLECTIBLE DROP OVERLAY -->
+<div class="drop-overlay" id="dropOverlay" onclick="dismissDrop()">
+  <div class="drop-rarity rare">✦ RARE DROP ✦</div>
+  <div class="drop-item" id="dropItem">🌹</div>
+  <div class="drop-name" id="dropName">Golden Rose</div>
+  <div class="drop-desc" id="dropDesc">From the Roses Collection — 3 of 12 collected</div>
+  <div class="drop-dismiss">tap anywhere to continue</div>
+</div>
+
+<script>
+  // PRELOADER
+  setTimeout(() => {
+    document.getElementById('preloader').classList.add('hidden');
+  }, 3500);
+
+  // PARTICLES
+  const particleEmojis = ['✨', '💫', '⭐', '🤍', '💕', '🌸'];
+  function createParticle() {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = particleEmojis[Math.floor(Math.random() * particleEmojis.length)];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (10 + Math.random() * 10) + 's';
+    p.style.animationDelay = Math.random() * 5 + 's';
+    p.style.fontSize = (10 + Math.random() * 16) + 'px';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 25000);
+  }
+  setInterval(createParticle, 800);
+
+  // CLICK SPARKLES
+  document.addEventListener('click', e => {
+    const emojis = ['✨', '💖', '💫', '⭐'];
+    const s = document.createElement('div');
+    s.className = 'click-sparkle';
+    s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    s.style.left = (e.clientX - 10) + 'px';
+    s.style.top = (e.clientY - 10) + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 600);
+  });
+
+  // OPEN SURPRISE
+  function openSurprise() {
+    document.getElementById('opener').style.display = 'none';
+    document.getElementById('content').classList.add('visible');
+    
+    // Animate letter paragraphs
+    setTimeout(() => {
+      const paragraphs = document.querySelectorAll('#letter p');
+      paragraphs.forEach((p, i) => {
+        setTimeout(() => {
+          p.style.transition = 'opacity 1s ease, transform 1s ease';
+          p.style.opacity = '1';
+          p.style.transform = 'translateY(0)';
+        }, i * 600);
+      });
+    }, 500);
+
+    // Start scroll observer
+    startScrollAnimations();
+
+    // Start day counter
+    startCounter();
+
+    // Show collectible drop after 10 seconds of scrolling
+    setTimeout(showDrop, 15000);
+  }
+
+  // SCROLL ANIMATIONS
+  function startScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateX(0) translateY(0)';
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.timeline-item, .reason, .promise-text').forEach(el => {
+      observer.observe(el);
+    });
+  }
+
+  // DAY COUNTER
+  function startCounter() {
+    const start = new Date('2025-08-01');
+    const now = new Date();
+    const days = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+    
+    const counter = document.getElementById('dayCounter');
+    let current = 0;
+    const step = Math.ceil(days / 60);
+    
+    const interval = setInterval(() => {
+      current += step;
+      if (current >= days) {
+        current = days;
+        clearInterval(interval);
+      }
+      counter.textContent = current.toLocaleString();
+    }, 30);
+
+    const hours = Math.floor((now - start) / (1000 * 60 * 60));
+    document.getElementById('counterSub').textContent = 
+      `that's ${hours.toLocaleString()} hours of loving you`;
+  }
+
+  // COLLECTIBLE DROP
+  function showDrop() {
+    const overlay = document.getElementById('dropOverlay');
+    overlay.classList.add('visible');
+    
+    // Sparkle burst
+    const item = document.getElementById('dropItem');
+    const rect = item.getBoundingClientRect();
+    for (let i = 0; i < 12; i++) {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'drop-sparkle';
+      sparkle.textContent = '✨';
+      sparkle.style.left = (rect.left + rect.width/2) + 'px';
+      sparkle.style.top = (rect.top + rect.height/2) + 'px';
+      sparkle.style.position = 'fixed';
+      const angle = (i / 12) * Math.PI * 2;
+      sparkle.style.setProperty('--tx', Math.cos(angle) * 100 + 'px');
+      sparkle.style.setProperty('--ty', Math.sin(angle) * 100 + 'px');
+      sparkle.style.animationDelay = (i * 0.05) + 's';
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 1500);
+    }
+  }
+
+  function dismissDrop() {
+    document.getElementById('dropOverlay').classList.remove('visible');
+  }
+</script>
+</body>
+</html>
