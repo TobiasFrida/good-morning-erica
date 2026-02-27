@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>📖 Our Story — A Fairytale</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600&display=swap');
+
+  :root {
+    --parchment: #f5e6c8;
+    --parchment2: #ede0c8;
+    --ink: #2a1810;
+    --ink-light: #5a4030;
+    --gold: #c9a84c;
+    --gold-glow: rgba(201,168,76,0.3);
+    --spine: #8b6914;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1218;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; overflow: hidden;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  /* PRELOADER */
+  .preloader {
+    position: fixed; inset: 0; z-index: 1000;
+    background: #1a1218;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+  .preloader.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+  .pre-icon { font-size: 3rem; animation: preFloat 2s ease infinite; }
+  @keyframes preFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .pre-text {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold); font-size: 0.9rem; margin-top: 16px;
+    letter-spacing: 3px;
+  }
+  .pre-sub { color: #666; font-size: 0.8rem; margin-top: 8px; font-style: italic; }
+
+  /* BOOK CONTAINER */
+  .book-wrap {
+    perspective: 1800px;
+    display: none; justify-content: center; align-items: center;
+  }
+  .book-wrap.show { display: flex; }
+
+  .book {
+    width: min(90vw, 380px);
+    height: min(75vh, 560px);
+    position: relative;
+    transform-style: preserve-3d;
+  }
+
+  /* PAGES */
+  .page {
+    position: absolute; inset: 0;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+    z-index: 1;
+    cursor: pointer;
+  }
+  .page.flipped { transform: rotateY(-180deg); z-index: 0; }
+
+  .page-front, .page-back {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    border-radius: 4px 12px 12px 4px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 30px 24px;
+    text-align: center;
+  }
+
+  .page-front {
+    background: var(--parchment);
+    box-shadow: inset -3px 0 8px rgba(0,0,0,0.1), 2px 0 6px rgba(0,0,0,0.2);
+  }
+  .page-back {
+    background: var(--parchment2);
+    transform: rotateY(180deg);
+    box-shadow: inset 3px 0 8px rgba(0,0,0,0.1), -2px 0 6px rgba(0,0,0,0.2);
+  }
+
+  /* PAGE TEXTURE */
+  .page-front::before, .page-back::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* GOLD BORDER */
+  .page-front::after, .page-back::after {
+    content: ''; position: absolute;
+    inset: 8px; border: 1px solid var(--gold);
+    border-radius: 2px 8px 8px 2px;
+    opacity: 0.3; pointer-events: none;
+  }
+
+  /* BOOK SPINE */
+  .book::before {
+    content: ''; position: absolute; left: -3px; top: 2px;
+    width: 6px; height: calc(100% - 4px);
+    background: linear-gradient(90deg, #5a3e10, var(--spine), #5a3e10);
+    border-radius: 3px 0 0 3px; z-index: 100;
+    box-shadow: -2px 0 4px rgba(0,0,0,0.3);
+  }
+
+  /* COVER */
+  .cover-front {
+    background: linear-gradient(145deg, #2a1810, #3d2415, #2a1810) !important;
+    box-shadow: inset -3px 0 10px rgba(0,0,0,0.3), 3px 0 8px rgba(0,0,0,0.4) !important;
+  }
+  .cover-front::after { border-color: var(--gold) !important; opacity: 0.5 !important; }
+  .cover-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.3rem, 5vw, 1.8rem);
+    color: var(--gold); line-height: 1.4;
+    text-shadow: 0 0 20px var(--gold-glow);
+    margin-bottom: 12px;
+  }
+  .cover-sub {
+    font-size: 1rem; color: #a08060;
+    font-style: italic;
+  }
+  .cover-ornament { color: var(--gold); font-size: 1.5rem; margin: 16px 0; opacity: 0.6; }
+  .cover-open {
+    margin-top: 20px; font-size: 0.7rem; color: #806040;
+    letter-spacing: 3px; text-transform: uppercase;
+    animation: coverPulse 2s ease infinite;
+  }
+  @keyframes coverPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 0.9; } }
+
+  /* CONTENT STYLES */
+  .page-chapter {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.7rem; color: var(--gold);
+    letter-spacing: 3px; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .page-country {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+    color: var(--ink); margin-bottom: 6px; line-height: 1.3;
+  }
+  .page-flag { font-size: 2rem; margin-bottom: 10px; }
+  .page-scene {
+    font-size: 2.5rem; margin: 10px 0;
+    line-height: 1.4;
+  }
+  .page-text {
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    color: var(--ink-light); line-height: 1.8;
+    max-width: 300px; font-style: italic;
+  }
+  .page-pokemon {
+    position: absolute; opacity: 0.15; font-size: 1.8rem;
+    pointer-events: none;
+  }
+  .page-pokemon.found {
+    opacity: 1 !important; transform: scale(1.2);
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 8px var(--gold-glow));
+  }
+  .pokemon-hint {
+    font-size: 0.6rem; color: var(--gold); opacity: 0.5;
+    position: absolute; bottom: 14px; right: 16px;
+    font-style: italic;
+  }
+  .page-ornament {
+    color: var(--gold); opacity: 0.3; font-size: 0.9rem;
+    margin: 8px 0; letter-spacing: 6px;
+  }
+  .page-num {
+    position: absolute; bottom: 12px;
+    font-size: 0.7rem; color: #b0a090;
+    font-style: italic;
+  }
+  .page-num.left { left: 16px; }
+  .page-num.right { right: 16px; }
+
+  /* NAVIGATION */
+  .nav-hint {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 0.7rem; color: #666; letter-spacing: 2px; z-index: 50;
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+  }
+
+  /* FLOATING SPARKLES */
+  .sparkle-float {
+    position: fixed; pointer-events: none; z-index: 0;
+    opacity: 0; animation: sparkFloat 10s linear infinite;
+  }
+  @keyframes sparkFloat {
+    0% { transform: translateY(105vh) rotate(0); opacity: 0; }
+    10% { opacity: 0.15; }
+    90% { opacity: 0.05; }
+    100% { transform: translateY(-5vh) rotate(180deg); opacity: 0; }
+  }
+
+  /* THE END PAGE */
+  .end-text {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.2rem; color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .end-sub {
+    font-family: 'Caveat', cursive;
+    font-size: 1.4rem; color: var(--ink-light);
+    margin-top: 8px;
+  }
+  .end-heart { font-size: 2.5rem; margin: 14px 0; }
+  .end-from {
+    font-family: 'Caveat', cursive;
+    font-size: 1.3rem; color: var(--gold);
+  }
+  .end-pokemon-count {
+    margin-top: 16px; font-size: 0.75rem; color: var(--gold);
+    opacity: 0.7;
+  }
+
+  /* BADGE */
+  .badge {
+    position: fixed; bottom: 10px; right: 10px;
+    font-size: 0.6rem; color: #444; letter-spacing: 1px; z-index: 200;
+  }
+  .badge i { color: #e88ca5; font-style: normal; }
+
+  /* CLICK SPARKLE */
+  .click-spark {
+    position: fixed; pointer-events: none; z-index: 300;
+    font-size: 16px; animation: csPop 0.5s ease forwards;
+  }
+  @keyframes csPop {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(1.2) translateY(-20px); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div class="preloader" id="preloader">
+  <div class="pre-icon">📖</div>
+  <div class="pre-text">Once Upon A Time...</div>
+  <div class="pre-sub">a love story was written across oceans</div>
+</div>
+
+<!-- BOOK -->
+<div class="book-wrap" id="bookWrap">
+  <div class="book" id="book">
+
+    <!-- COVER (Page 0) -->
+    <div class="page" id="page-0" onclick="flipPage(0)">
+      <div class="page-front cover-front">
+        <div class="cover-ornament">✦ ✦ ✦</div>
+        <div class="cover-title">The Adventures of<br>Tobias & Erica</div>
+        <div class="cover-sub">A Love Story Across Oceans</div>
+        <div class="cover-ornament">✦ ✦ ✦</div>
+        <div style="font-size:1.5rem; margin: 8px 0;">🌍❤️🌏</div>
+        <div class="cover-open">tap to open</div>
+      </div>
+      <div class="page-back">
+        <div style="font-size:0.8rem; color: var(--ink-light); font-style:italic; line-height:2;">
+          <div style="font-size:1.2rem; margin-bottom:12px;">📜</div>
+          "In a world of 8 billion people,<br>
+          across 4,832 miles of ocean,<br>
+          two hearts found each other<br>
+          and decided that distance<br>
+          was just a number."<br><br>
+          <span style="color: var(--gold); font-size:0.7rem; letter-spacing:2px;">THIS IS THEIR STORY</span>
+        </div>
+        <div class="page-num right">i</div>
+      </div>
+    </div>
+
+    <!-- PAGE 1: HAWAII -->
+    <div class="page" id="page-1" onclick="flipPage(1)">
+      <div class="page-front">
+        <div class="page-chapter">Chapter One</div>
+        <div class="page-flag">🌺</div>
+        <div class="page-country">Hawai'i</div>
+        <div class="page-ornament">— ✦ —</div>
+        <div class="page-scene">🏝️🌊🌅🌴</div>
+        <div class="page-text">
+          And so the brave knight from the frozen north sailed across the great Pacific to the islands of fire and flowers, where he would meet his princess for the very first time.
+        </div>
+        <div class="page-pokemon" style="top:12px; left:14px;" onclick="findPokemon(this, event)">🐢</div>
+        <div class="page-pokemon" style="bottom:30px; right:14px;" onclick="findPokemon(this, event)">🌊</div>
+        <div class="pokemon-hint">find the hidden pokémon ✨</div>
+        <div class="page-num right">1</div>
+      </div>
+      <div class="page-back">
+        <div class="page-scene">🌺👫🌅</div>
+        <div class="page-text">
+          The moment their eyes met, the ocean itself held its breath. Every sunset after that one would be measured against the golden light of that Hawaiian evening.<br><br>
+          "It was even better than the fairy tales," she whispered.
+        </div>
+        <div class="page-pokemon" style="top:10px; right:12px;" onclick="findPokemon(this, event)">⭐</div>
+        <div class="page-num left">2</div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: SAN DIEGO -->
+    <div class="page" id="page-2" onclick="flipPage(2)">
+      <div class="page-front">
+        <div class="page-chapter">Chapter Two</div>
+        <div class="page-flag">🌴</div>
+        <div class="page-country">San Diego</div>
+        <div class="page-ornament">— ✦ —</div>
+        <div class="page-scene">🏖️☀️🐱🏡</div>
+        <div class="page-text">
+          Next, the knight ventured to the princess's own kingdom — a sun-kissed land by the sea. There he met the royal guardian: a fluffy white cat named Kiru, who inspected him very carefully.
+        </div>
+        <div class="page-pokemon" style="bottom:28px; left:14px;" onclick="findPokemon(this, event)">🔥</div>
+        <div class="page-pokemon" style="top:14px; right:16px;" onclick="findPokemon(this, event)">⚡</div>
+        <div class="pokemon-hint">find the hidden pokémon ✨</div>
+        <div class="page-num right">3</div>
+      </div>
+      <div class="page-back">
+        <div class="page-scene">🐱💕👫🌇</div>
+        <div class="page-text">
+          In her world, everything made sense. Her apartment. Her favorite spots. The way the California sun painted everything gold at 6pm.<br><br>
+          He fit into her life like the missing piece of a puzzle she didn't know was incomplete.
+        </div>
+        <div class="page-pokemon" style="bottom:20px; right:12px;" onclick="findPokemon(this, event)">🌸</div>
+        <div class="page-num left">4</div>
+      </div>
+    </div>
+
+    <!-- PAGE 3: SWEDEN -->
+    <div class="page" id="page-3" onclick="flipPage(3)">
+      <div class="page-front">
+        <div class="page-chapter">Chapter Three</div>
+        <div class="page-flag">🇸🇪</div>
+        <div class="page-country">Umeå, Sweden</div>
+        <div class="page-ornament">— ✦ —</div>
+        <div class="page-scene">❄️🏔️🌲🦌</div>
+        <div class="page-text">
+          Then came the day the princess would see the knight's homeland — a quiet kingdom in the frozen north, where snow blanketed the earth and the northern lights danced across the sky.
+        </div>
+        <div class="page-pokemon" style="top:12px; left:16px;" onclick="findPokemon(this, event)">❄️</div>
+        <div class="page-pokemon" style="bottom:30px; right:14px;" onclick="findPokemon(this, event)">🦊</div>
+        <div class="pokemon-hint">find the hidden pokémon ✨</div>
+        <div class="page-num right">5</div>
+      </div>
+      <div class="page-back">
+        <div class="page-scene">🌌👫☕🏠</div>
+        <div class="page-text">
+          She saw where he grew up. Where he learned to build with his hands. Where he dreamed of her before he even knew her name.<br><br>
+          "So this is where my favorite person was made," she said, squeezing his hand in the cold.
+        </div>
+        <div class="page-pokemon" style="top:14px; right:14px;" onclick="findPokemon(this, event)">💎</div>
+        <div class="page-num left">6</div>
+      </div>
+    </div>
+
+    <!-- PAGE 4: JAPAN -->
+    <div class="page" id="page-4" onclick="flipPage(4)">
+      <div class="page-front">
+        <div class="page-chapter">Chapter Four</div>
+        <div class="page-flag">🇯🇵</div>
+        <div class="page-country">Japan</div>
+        <div class="page-ornament">— ✦ —</div>
+        <div class="page-scene">⛩️🌸🗼🎌</div>
+        <div class="page-text">
+          Together they sailed east to the ancient land of temples and cherry blossoms. In Tokyo, the city glowed with a million lights. In Kyoto, the temples stood in perfect silence.
+        </div>
+        <div class="page-pokemon" style="top:10px; right:14px;" onclick="findPokemon(this, event)">🐉</div>
+        <div class="page-pokemon" style="bottom:28px; left:12px;" onclick="findPokemon(this, event)">🎐</div>
+        <div class="pokemon-hint">find the hidden pokémon ✨</div>
+        <div class="page-num right">7</div>
+      </div>
+      <div class="page-back">
+        <div class="page-scene">🍜🏯👫🌸</div>
+        <div class="page-text">
+          They ate ramen at midnight. Got lost in narrow streets. Prayed at a shrine together — the same prayer, without saying it out loud.<br><br>
+          Some adventures don't need a map. Just the right person beside you.
+        </div>
+        <div class="page-pokemon" style="bottom:18px; right:14px;" onclick="findPokemon(this, event)">🐱</div>
+        <div class="page-num left">8</div>
+      </div>
+    </div>
+
+    <!-- PAGE 5: THAILAND -->
+    <div class="page" id="page-5" onclick="flipPage(5)">
+      <div class="page-front">
+        <div class="page-chapter">Chapter Five</div>
+        <div class="page-flag">🇹🇭</div>
+        <div class="page-country">Thailand</div>
+        <div class="page-ornament">— ✦ —</div>
+        <div class="page-scene">🏮🏖️🌙✨</div>
+        <div class="page-text">
+          On a warm November night in Chiang Mai, they stood among thousands of lanterns rising into the sky at Yi Peng. Each one carried a wish. Theirs carried the same one.
+        </div>
+        <div class="page-pokemon" style="top:14px; left:14px;" onclick="findPokemon(this, event)">🔮</div>
+        <div class="page-pokemon" style="bottom:30px; right:16px;" onclick="findPokemon(this, event)">🌙</div>
+        <div class="pokemon-hint">find the hidden pokémon ✨</div>
+        <div class="page-num right">9</div>
+      </div>
+      <div class="page-back">
+        <div class="page-scene">🏮🏮🏮<br>👫<br>🏮🏮🏮</div>
+        <div class="page-text">
+          As the lanterns floated away, she leaned into him and said:<br><br>
+          <span style="color: var(--ink); font-style:normal; font-weight:600;">"I don't need to make a wish. I already have everything."</span>
+        </div>
+        <div class="page-pokemon" style="top:10px; left:10px;" onclick="findPokemon(this, event)">✨</div>
+        <div class="page-num left">10</div>
+      </div>
+    </div>
+
+    <!-- PAGE 6: THE END -->
+    <div class="page" id="page-6" onclick="flipPage(6)">
+      <div class="page-front">
+        <div class="page-chapter">The Final Chapter</div>
+        <div class="page-flag">🔑</div>
+        <div class="page-country">Home</div>
+        <div class="page-ornament">— ✦ —</div>
+        <div class="page-scene">🏡💕👫🌅</div>
+        <div class="page-text">
+          And one day — not in a fairy tale, but in real life — the knight and the princess finally closed the distance. Same home. Same mornings. Same forever.<br><br>
+          Not "the end."<br>
+          <span style="color:var(--gold); font-weight:600;">Just the beginning.</span>
+        </div>
+        <div class="page-pokemon" style="top:12px; right:12px;" onclick="findPokemon(this, event)">👑</div>
+        <div class="page-pokemon" style="bottom:26px; left:12px;" onclick="findPokemon(this, event)">💜</div>
+        <div class="page-num right">11</div>
+      </div>
+      <div class="page-back">
+        <div class="end-heart">💜</div>
+        <div class="end-text">The End</div>
+        <div style="font-size:0.75rem; color:var(--gold); letter-spacing:2px; margin:4px 0;">(...for now)</div>
+        <div class="end-sub">I love you, Tobias.</div>
+        <div class="end-sub">Every chapter. Every country. Every late night.</div>
+        <div class="end-sub">You're my whole story.</div>
+        <div style="margin-top:16px;">
+          <div class="end-from">Forever yours, Erica 💜</div>
+        </div>
+        <div class="end-pokemon-count" id="pokemonCount">Pokémon found: 0 / 16</div>
+        <div class="page-num left">12</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="nav-hint" id="navHint">tap the page to turn →</div>
+<div class="badge">made with <i>♥</i> on Closer</div>
+
+<script>
+  let currentPage = 0;
+  const totalPages = 7;
+  let pokemonFound = 0;
+
+  // Preloader
+  setTimeout(() => {
+    document.getElementById('preloader').classList.add('gone');
+    document.getElementById('bookWrap').classList.add('show');
+  }, 3000);
+
+  // Background sparkles
+  const sparkEmojis = ['✨','⭐','💫','🌟'];
+  function spawnSparkle() {
+    const s = document.createElement('div');
+    s.className = 'sparkle-float';
+    s.textContent = sparkEmojis[Math.floor(Math.random() * sparkEmojis.length)];
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.animationDuration = (7 + Math.random() * 6) + 's';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    s.style.fontSize = (8 + Math.random() * 10) + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 16000);
+  }
+  setInterval(spawnSparkle, 1200);
+
+  // Click sparkle
+  document.addEventListener('click', e => {
+    const sp = document.createElement('div');
+    sp.className = 'click-spark';
+    sp.textContent = ['✨','💫','⭐'][Math.floor(Math.random()*3)];
+    sp.style.left = (e.clientX - 8) + 'px';
+    sp.style.top = (e.clientY - 8) + 'px';
+    document.body.appendChild(sp);
+    setTimeout(() => sp.remove(), 500);
+  });
+
+  // Page flip
+  function flipPage(idx) {
+    const page = document.getElementById('page-' + idx);
+    if (!page) return;
+
+    if (!page.classList.contains('flipped')) {
+      // Flip forward
+      page.classList.add('flipped');
+      currentPage = idx + 1;
+      // Update z-index for proper stacking
+      updateZIndex();
+    } else {
+      // Flip back
+      page.classList.remove('flipped');
+      currentPage = idx;
+      updateZIndex();
+    }
+
+    // Hide nav hint after first flip
+    if (currentPage > 0) {
+      document.getElementById('navHint').style.opacity = '0';
+    }
+  }
+
+  function updateZIndex() {
+    for (let i = 0; i < totalPages; i++) {
+      const p = document.getElementById('page-' + i);
+      if (p.classList.contains('flipped')) {
+        p.style.zIndex = i;
+      } else {
+        p.style.zIndex = totalPages - i;
+      }
+    }
+  }
+
+  // Initialize z-index
+  updateZIndex();
+
+  // Find pokemon
+  function findPokemon(el, e) {
+    e.stopPropagation();
+    if (el.classList.contains('found')) return;
+    el.classList.add('found');
+    pokemonFound++;
+    document.getElementById('pokemonCount').textContent = 'Pokémon found: ' + pokemonFound + ' / 16';
+
+    // Burst effect
+    for (let i = 0; i < 6; i++) {
+      const star = document.createElement('div');
+      star.className = 'click-spark';
+      star.textContent = '✨';
+      star.style.left = (e.clientX - 8 + (Math.random()-0.5)*40) + 'px';
+      star.style.top = (e.clientY - 8 + (Math.random()-0.5)*40) + 'px';
+      document.body.appendChild(star);
+      setTimeout(() => star.remove(), 500);
+    }
+  }
+</script>
+</body>
+</html>
