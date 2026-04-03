@@ -350,21 +350,24 @@
             trail.style.setProperty('--ry', -(startY - endY) + 'px');
             document.body.appendChild(trail);
             
-            // Explosion after trail
+            // Heart-shaped explosion
             setTimeout(() => {
                 trail.remove();
-                const sparkCount = 20 + Math.floor(Math.random() * 15);
+                // Heart parametric: x = 16sin³(t), y = 13cos(t) - 5cos(2t) - 2cos(3t) - cos(4t)
+                const sparkCount = 30;
                 for (let i = 0; i < sparkCount; i++) {
                     const s = document.createElement('div');
                     s.className = 'firework-spark';
                     s.style.left = startX + 'px';
                     s.style.top = endY + 'px';
                     s.style.background = color;
-                    s.style.boxShadow = `0 0 4px ${color}`;
-                    const angle = (Math.PI * 2 / sparkCount) * i + (Math.random() * 0.3);
-                    const dist = 40 + Math.random() * 80;
-                    s.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
-                    s.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+                    s.style.boxShadow = `0 0 6px ${color}`;
+                    const t = (Math.PI * 2 / sparkCount) * i;
+                    const hx = 16 * Math.pow(Math.sin(t), 3);
+                    const hy = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                    const scale = 5 + Math.random() * 2;
+                    s.style.setProperty('--sx', hx * scale + 'px');
+                    s.style.setProperty('--sy', hy * scale + 'px');
                     s.style.animationDelay = (Math.random() * 0.1) + 's';
                     document.body.appendChild(s);
                     setTimeout(() => s.remove(), 1200);
