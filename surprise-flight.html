@@ -27,7 +27,7 @@
         /* Bubbles */
         .bubble {
             position: fixed; z-index: 5;
-            width: 28px; height: 28px;
+            width: 56px; height: 56px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 2px;
             pointer-events: auto;
@@ -41,7 +41,7 @@
             content: '';
             position: absolute;
             top: 12%; right: 18%;
-            width: 6px; height: 4px;
+            width: 12px; height: 8px;
             background: rgba(255,255,255,0.4);
             border-radius: 50%;
             transform: rotate(-20deg);
@@ -50,24 +50,19 @@
             content: '';
             position: absolute;
             top: 20%; right: 22%;
-            width: 3px; height: 2px;
+            width: 5px; height: 3px;
             background: rgba(255,255,255,0.3);
             border-radius: 50%;
             transform: rotate(-20deg);
         }
-        .bubble .emoji { font-size: 10px; line-height: 1; position: relative; z-index: 1; }
-        .bubble .text { font-size: 5px; color: #c0d8f0; font-weight: 400; text-align: center; line-height: 1; max-width: 24px; overflow: hidden; position: relative; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .bubble .emoji { font-size: 16px; line-height: 1; position: relative; z-index: 1; }
+        .bubble .text { font-size: 7px; color: #c0d8f0; font-weight: 400; text-align: center; line-height: 1; max-width: 44px; overflow: hidden; position: relative; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         
         /* Heart explosion */
         .heart-burst { position: fixed; pointer-events: none; z-index: 10; font-size: 18px; animation: burstOut 0.8s ease-out forwards; }
         @keyframes burstOut { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--bx), var(--by)) scale(0.3); opacity: 0; } }
         
-        /* Dolphins */
-        .dolphin {
-            position: fixed; z-index: 5;
-            font-size: 30px;
-            pointer-events: none;
-        }
+        /* (dolphins removed) */
         
         /* Firework */
         .firework-trail { position: fixed; pointer-events: none; z-index: 10; width: 4px; height: 4px; border-radius: 50%; animation: rocketUp var(--dur) ease-out forwards; }
@@ -191,7 +186,7 @@
         
         // Falling stars and hearts
         const fallingEmojis = ['⭐', '💖', '✨', '💗', '⭐', '💕', '✨', '💖', '⭐', '💗'];
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 20; i++) {
             const el = document.createElement('div');
             el.className = 'falling';
             el.textContent = fallingEmojis[i % fallingEmojis.length];
@@ -216,7 +211,7 @@
         const bubbles = [];
         const W = () => window.innerWidth;
         const H = () => window.innerHeight;
-        const SIZE = 28;
+        const SIZE = 56;
         const R = SIZE / 2;
         
         // Curved ocean boundary — matches the SVG bowl
@@ -307,8 +302,7 @@
                 if (spd < 0.3) { b.vx *= 1.5; b.vy *= 1.5; }
                 if (spd > 3) { b.vx *= 0.9; b.vy *= 0.9; }
                 
-                // Add gentle wobble (underwater feel)
-                b.x += Math.sin(Date.now() * 0.001 + i) * 0.15;
+                // no wobble for perf
                 
                 b.el.style.left = b.x + 'px';
                 b.el.style.top = b.y + 'px';
@@ -319,75 +313,7 @@
         
         animate();
         
-        // Dolphins - swim back and forth, jump over water
-        const dolphins = [];
-        for (let i = 0; i < 3; i++) {
-            const el = document.createElement('div');
-            el.className = 'dolphin';
-            el.textContent = '🐬';
-            document.body.appendChild(el);
-            dolphins.push({
-                el,
-                x: Math.random() * W(),
-                y: H() * 0.72 + Math.random() * (H() * 0.15),
-                vx: (1.5 + Math.random()) * (Math.random() > 0.5 ? 1 : -1),
-                phase: Math.random() * Math.PI * 2,
-                jumpTimer: 0,
-                jumping: false,
-                jumpY: 0,
-                jumpVy: 0
-            });
-        }
-        
-        function animateDolphins() {
-            dolphins.forEach(d => {
-                const waterBot = H() - 40;
-                
-                d.x += d.vx;
-                
-                // Bounce off edges
-                if (d.x < -30) { d.x = -30; d.vx = Math.abs(d.vx); }
-                if (d.x > W() + 10) { d.x = W() + 10; d.vx = -Math.abs(d.vx); }
-                
-                const waterTop = waterSurfaceY(d.x + 15);
-                
-                // Random jumping
-                d.jumpTimer++;
-                if (!d.jumping && d.jumpTimer > 120 + Math.random() * 200) {
-                    d.jumping = true;
-                    d.jumpTimer = 0;
-                    d.jumpVy = -(6 + Math.random() * 4);
-                    d.jumpY = 0;
-                }
-                
-                let yOffset = 0;
-                let rot = 0;
-                if (d.jumping) {
-                    d.jumpVy += 0.2; // gravity
-                    d.jumpY += d.jumpVy;
-                    yOffset = d.jumpY;
-                    rot = d.jumpVy * 3;
-                    if (d.jumpY > 0) {
-                        d.jumping = false;
-                        d.jumpY = 0;
-                        yOffset = 0;
-                    }
-                } else {
-                    // Gentle bob
-                    d.phase += 0.03;
-                    yOffset = Math.sin(d.phase) * 5;
-                }
-                
-                const baseY = waterTop + 20 + (waterBot - waterTop - 40) * ((dolphins.indexOf(d) + 1) / 4);
-                const facing = d.vx > 0 ? 'scaleX(-1)' : 'scaleX(1)';
-                
-                d.el.style.left = d.x + 'px';
-                d.el.style.top = (baseY + yOffset) + 'px';
-                d.el.style.transform = `${facing} rotate(${rot}deg)`;
-            });
-            requestAnimationFrame(animateDolphins);
-        }
-        animateDolphins();
+        // dolphins removed
         
         // Fireworks from bottom on page click
         const fwColors = ['#ff6b9d','#c850c0','#4158d0','#ff2d95','#ffd700','#00e5ff','#ff4757','#7bed9f'];
