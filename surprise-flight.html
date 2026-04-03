@@ -72,18 +72,6 @@
             position: fixed; z-index: 5;
             font-size: 30px;
             pointer-events: none;
-            animation: dolphinJump var(--dur) ease-in-out infinite;
-            animation-delay: var(--delay);
-        }
-        @keyframes dolphinJump {
-            0% { transform: translate(0, 0) scaleX(var(--dir)) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            30% { transform: translate(calc(var(--dx) * 0.3), -120px) scaleX(var(--dir)) rotate(-30deg); }
-            50% { transform: translate(calc(var(--dx) * 0.5), -160px) scaleX(var(--dir)) rotate(-15deg); opacity: 1; }
-            70% { transform: translate(calc(var(--dx) * 0.7), -120px) scaleX(var(--dir)) rotate(15deg); }
-            85% { transform: translate(calc(var(--dx) * 0.85), -30px) scaleX(var(--dir)) rotate(40deg); opacity: 1; }
-            95% { opacity: 0; }
-            100% { transform: translate(var(--dx), 40px) scaleX(var(--dir)) rotate(50deg); opacity: 0; }
         }
         
         /* Firework */
@@ -314,21 +302,74 @@
         
         animate();
         
-        // Dolphins jumping across water
-        const oceanY = () => H() * 0.70;
+        // Dolphins - swim back and forth, jump over water
+        const dolphins = [];
         for (let i = 0; i < 3; i++) {
-            const d = document.createElement('div');
-            d.className = 'dolphin';
-            d.textContent = '🐬';
-            const goRight = Math.random() > 0.5;
-            d.style.left = goRight ? (Math.random() * 30) + '%' : (60 + Math.random() * 30) + '%';
-            d.style.top = (oceanY() / H() * 100) + '%';
-            d.style.setProperty('--dur', (4 + Math.random() * 3) + 's');
-            d.style.setProperty('--delay', (i * 3 + Math.random() * 4) + 's');
-            d.style.setProperty('--dx', (goRight ? 1 : -1) * (200 + Math.random() * 200) + 'px');
-            d.style.setProperty('--dir', goRight ? '1' : '-1');
-            document.body.appendChild(d);
+            const el = document.createElement('div');
+            el.className = 'dolphin';
+            el.textContent = '🐬';
+            document.body.appendChild(el);
+            dolphins.push({
+                el,
+                x: Math.random() * W(),
+                y: H() * 0.72 + Math.random() * (H() * 0.15),
+                vx: (1.5 + Math.random()) * (Math.random() > 0.5 ? 1 : -1),
+                phase: Math.random() * Math.PI * 2,
+                jumpTimer: 0,
+                jumping: false,
+                jumpY: 0,
+                jumpVy: 0
+            });
         }
+        
+        function animateDolphins() {
+            dolphins.forEach(d => {
+                const waterTop = H() * 0.70;
+                const waterBot = H() - 40;
+                
+                d.x += d.vx;
+                
+                // Bounce off edges
+                if (d.x < -30) { d.x = -30; d.vx = Math.abs(d.vx); }
+                if (d.x > W() + 10) { d.x = W() + 10; d.vx = -Math.abs(d.vx); }
+                
+                // Random jumping
+                d.jumpTimer++;
+                if (!d.jumping && d.jumpTimer > 120 + Math.random() * 200) {
+                    d.jumping = true;
+                    d.jumpTimer = 0;
+                    d.jumpVy = -(6 + Math.random() * 4);
+                    d.jumpY = 0;
+                }
+                
+                let yOffset = 0;
+                let rot = 0;
+                if (d.jumping) {
+                    d.jumpVy += 0.2; // gravity
+                    d.jumpY += d.jumpVy;
+                    yOffset = d.jumpY;
+                    rot = d.jumpVy * 3;
+                    if (d.jumpY > 0) {
+                        d.jumping = false;
+                        d.jumpY = 0;
+                        yOffset = 0;
+                    }
+                } else {
+                    // Gentle bob
+                    d.phase += 0.03;
+                    yOffset = Math.sin(d.phase) * 5;
+                }
+                
+                const baseY = waterTop + 20 + (waterBot - waterTop - 40) * ((dolphins.indexOf(d) + 1) / 4);
+                const facing = d.vx > 0 ? 'scaleX(-1)' : 'scaleX(1)';
+                
+                d.el.style.left = d.x + 'px';
+                d.el.style.top = (baseY + yOffset) + 'px';
+                d.el.style.transform = `${facing} rotate(${rot}deg)`;
+            });
+            requestAnimationFrame(animateDolphins);
+        }
+        animateDolphins();
         
         // Fireworks from bottom on page click
         const fwColors = ['#ff6b9d','#c850c0','#4158d0','#ff2d95','#ffd700','#00e5ff','#ff4757','#7bed9f'];
