@@ -10,11 +10,21 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a1a; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; min-height: 100vh; }
         
-        /* Background slideshow */
-        .bg-slideshow { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
-        .bg-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 2s ease-in-out; }
-        .bg-slide.active { opacity: 1; }
-        .bg-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,10,26,0.75); z-index: 0; }
+        /* Background photo collage */
+        .bg-collage {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 4px;
+            padding: 4px;
+        }
+        .bg-collage img {
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.85;
+            transition: opacity 1s;
+        }
+        .bg-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,10,26,0.65); z-index: 0; backdrop-filter: blur(2px); }
         
         .stars { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
         .star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: twinkle var(--dur) ease-in-out infinite; }
@@ -113,15 +123,15 @@
     </style>
 </head>
 <body>
-    <div class="bg-slideshow" id="slideshow">
-        <div class="bg-slide active" style="background-image:url('photo1.jpg')"></div>
-        <div class="bg-slide" style="background-image:url('photo4.jpg')"></div>
-        <div class="bg-slide" style="background-image:url('photo5.jpg')"></div>
-        <div class="bg-slide" style="background-image:url('photo2.jpg')"></div>
-        <div class="bg-slide" style="background-image:url('photo6.jpg')"></div>
-        <div class="bg-slide" style="background-image:url('photo3.jpg')"></div>
-        <div class="bg-slide" style="background-image:url('photo8.jpg')"></div>
-        <div class="bg-slide" style="background-image:url('photo7.jpg')"></div>
+    <div class="bg-collage">
+        <img src="photo1.jpg" alt="">
+        <img src="photo4.jpg" alt="">
+        <img src="photo5.jpg" alt="">
+        <img src="photo2.jpg" alt="">
+        <img src="photo6.jpg" alt="">
+        <img src="photo3.jpg" alt="">
+        <img src="photo8.jpg" alt="">
+        <img src="photo7.jpg" alt="">
     </div>
     <div class="bg-overlay"></div>
     <div class="stars" id="stars"></div>
@@ -316,14 +326,7 @@
         function updateCD() { const d = Math.max(0, target-Date.now()); document.getElementById('cd-days').textContent=Math.floor(d/864e5); document.getElementById('cd-hours').textContent=Math.floor((d%864e5)/36e5); document.getElementById('cd-mins').textContent=Math.floor((d%36e5)/6e4); document.getElementById('cd-secs').textContent=Math.floor((d%6e4)/1e3); }
         updateCD(); setInterval(updateCD, 1000);
         
-        // Background slideshow
-        const slides = document.querySelectorAll('.bg-slide');
-        let currentSlide = 0;
-        setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 6000);
+        // collage bg loaded
     </script>
 </body>
 </html>
