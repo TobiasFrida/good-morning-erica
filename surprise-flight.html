@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>💕</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #0a0a1a;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .stars {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite;
+        }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .intro {
+            opacity: 0;
+            animation: fadeUp 1.5s ease forwards;
+            margin-bottom: 60px;
+        }
+        .intro h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(28px, 6vw, 48px);
+            background: linear-gradient(135deg, #ff6b9d, #c850c0, #4158d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+        .intro p {
+            font-size: 16px;
+            color: #a0a0c0;
+            font-weight: 300;
+        }
+        .date-badge {
+            display: inline-block;
+            background: rgba(200, 80, 192, 0.15);
+            border: 1px solid rgba(200, 80, 192, 0.3);
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            color: #c850c0;
+            margin-top: 20px;
+            letter-spacing: 2px;
+        }
+        
+        /* Flight path */
+        .flight-path {
+            position: relative;
+            margin: 40px 0;
+        }
+        
+        .flight-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #4158d0, #c850c0, #ff6b9d);
+            transform: translateX(-50%);
+            opacity: 0.3;
+        }
+        
+        .flight-leg {
+            position: relative;
+            padding: 30px 0;
+            opacity: 0;
+        }
+        .flight-leg.visible { animation: fadeUp 0.8s ease forwards; }
+        
+        .leg-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 0 20px;
+            transition: transform 0.3s;
+        }
+        .leg-card:hover { transform: scale(1.02); }
+        
+        .leg-number {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #4158d0, #c850c0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .route {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .city {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+        }
+        .plane-icon {
+            font-size: 24px;
+            animation: fly 2s ease-in-out infinite;
+        }
+        @keyframes fly { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(8px); } }
+        
+        .leg-details {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            color: #a0a0c0;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        .leg-details span { display: flex; align-items: center; gap: 6px; }
+        
+        .leg-message {
+            font-style: italic;
+            color: #c0c0e0;
+            font-size: 14px;
+            margin-top: 12px;
+            opacity: 0.8;
+        }
+        
+        .stopover {
+            text-align: center;
+            padding: 16px;
+            opacity: 0;
+        }
+        .stopover.visible { animation: fadeUp 0.6s ease forwards; }
+        .stopover-dot {
+            width: 12px; height: 12px;
+            background: #c850c0;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            box-shadow: 0 0 20px rgba(200, 80, 192, 0.5);
+        }
+        .stopover-text { font-size: 12px; color: #808098; }
+        
+        /* Final destination */
+        .destination {
+            margin-top: 60px;
+            opacity: 0;
+        }
+        .destination.visible { animation: fadeUp 1s ease forwards; }
+        
+        .destination h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(24px, 5vw, 40px);
+            margin-bottom: 16px;
+        }
+        .destination .heart {
+            font-size: 60px;
+            display: inline-block;
+            animation: heartbeat 1.2s ease-in-out infinite;
+        }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        
+        .countdown {
+            margin-top: 40px;
+            opacity: 0;
+        }
+        .countdown.visible { animation: fadeUp 1s ease forwards; }
+        .countdown-label {
+            font-size: 13px;
+            color: #808098;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .countdown-boxes {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        .cd-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 80, 192, 0.2);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 70px;
+        }
+        .cd-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: #c850c0;
+        }
+        .cd-label {
+            font-size: 11px;
+            color: #808098;
+            margin-top: 4px;
+        }
+        
+        .final-message {
+            margin-top: 50px;
+            padding: 30px;
+            opacity: 0;
+        }
+        .final-message.visible { animation: fadeUp 1.2s ease forwards; }
+        .final-message p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #d0d0e8;
+            font-weight: 300;
+        }
+        .final-message .signature {
+            margin-top: 20px;
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: #ff6b9d;
+        }
+        
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .floating-hearts {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .fheart {
+            position: absolute;
+            bottom: -50px;
+            font-size: 20px;
+            opacity: 0;
+            animation: floatUp var(--dur) var(--delay) ease-in infinite;
+        }
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(0) rotate(0deg); }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { opacity: 0; transform: translateY(-100vh) rotate(45deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="floating-hearts" id="hearts"></div>
+    
+    <div class="container">
+        <div class="intro">
+            <h1>I'm On My Way To You</h1>
+            <p>Every mile is one step closer to your arms</p>
+            <div class="date-badge">APRIL 9, 2026</div>
+        </div>
+        
+        <div class="flight-path">
+            <div class="flight-line"></div>
+            
+            <div class="flight-leg" data-delay="500">
+                <div class="leg-card">
+                    <div class="leg-number">1</div>
+                    <div class="route">
+                        <span class="city">Umeå</span>
+                        <span class="plane-icon">✈️</span>
+                        <span class="city">Helsinki</span>
+                    </div>
+                    <div class="leg-details">
+                        <span>🕐 8:35 AM → 10:50 AM</span>
+                        <span>⏱ 1h 15m</span>
+                    </div>
+                    <div class="leg-message">"Leaving home... but flying to my home."</div>
+                </div>
+            </div>
+            
+            <div class="stopover" data-delay="1200">
+                <div class="stopover-dot"></div>
+                <div class="stopover-text">5h 35m layover in Helsinki ☕</div>
+            </div>
+            
+            <div class="flight-leg" data-delay="1800">
+                <div class="leg-card">
+                    <div class="leg-number">2</div>
+                    <div class="route">
+                        <span class="city">Helsinki</span>
+                        <span class="plane-icon">✈️</span>
+                        <span class="city">Chicago</span>
+                    </div>
+                    <div class="leg-details">
+                        <span>🕐 4:25 PM → 5:50 PM</span>
+                        <span>⏱ 9h 25m</span>
+                    </div>
+                    <div class="leg-message">"Crossing the Atlantic... every second thinking of you."</div>
+                </div>
+            </div>
+            
+            <div class="stopover" data-delay="2500">
+                <div class="stopover-dot"></div>
+                <div class="stopover-text">3h 10m layover in Chicago 🌆</div>
+            </div>
+            
+            <div class="flight-leg" data-delay="3000">
+                <div class="leg-card">
+                    <div class="leg-number">3</div>
+                    <div class="route">
+                        <span class="city">Chicago</span>
+                        <span class="plane-icon">✈️</span>
+                        <span class="city">San Diego</span>
+                    </div>
+                    <div class="leg-details">
+                        <span>🕐 9:00 PM → 11:33 PM</span>
+                        <span>⏱ 4h 33m</span>
+                    </div>
+                    <div class="leg-message">"The last leg... I can almost feel you already."</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="destination" data-delay="4000">
+            <div class="heart">💕</div>
+            <h2>Landing in San Diego</h2>
+            <p style="color: #a0a0c0;">23 hours and 58 minutes of flying...<br>just to see your smile</p>
+        </div>
+        
+        <div class="countdown" data-delay="4800">
+            <div class="countdown-label">Countdown</div>
+            <div class="countdown-boxes">
+                <div class="cd-box"><div class="cd-num" id="cd-days">--</div><div class="cd-label">days</div></div>
+                <div class="cd-box"><div class="cd-num" id="cd-hours">--</div><div class="cd-label">hours</div></div>
+                <div class="cd-box"><div class="cd-num" id="cd-mins">--</div><div class="cd-label">mins</div></div>
+                <div class="cd-box"><div class="cd-num" id="cd-secs">--</div><div class="cd-label">secs</div></div>
+            </div>
+        </div>
+        
+        <div class="final-message" data-delay="5500">
+            <p>I would fly across the entire world<br>just to hold you for one second.<br><br>But I'm coming for way more than a second. 😏💕</p>
+            <div class="signature">— Tobias ❤️</div>
+        </div>
+    </div>
+    
+    <script>
+        // Stars
+        const starsEl = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.setProperty('--dur', (2 + Math.random() * 3) + 's');
+            s.style.animationDelay = Math.random() * 3 + 's';
+            starsEl.appendChild(s);
+        }
+        
+        // Floating hearts
+        const heartsEl = document.getElementById('hearts');
+        const heartEmojis = ['💕', '💗', '💖', '✨', '💜'];
+        for (let i = 0; i < 15; i++) {
+            const h = document.createElement('div');
+            h.className = 'fheart';
+            h.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            h.style.left = Math.random() * 100 + '%';
+            h.style.setProperty('--dur', (8 + Math.random() * 8) + 's');
+            h.style.setProperty('--delay', (Math.random() * 10) + 's');
+            h.style.fontSize = (14 + Math.random() * 16) + 'px';
+            heartsEl.appendChild(h);
+        }
+        
+        // Scroll/timer reveal
+        const reveals = document.querySelectorAll('.flight-leg, .stopover, .destination, .countdown, .final-message');
+        reveals.forEach(el => {
+            const delay = parseInt(el.dataset.delay) || 0;
+            setTimeout(() => el.classList.add('visible'), delay);
+        });
+        
+        // Countdown to April 9, 2026 8:35 AM (departure)
+        const target = new Date('2026-04-09T08:35:00+02:00').getTime();
+        function updateCD() {
+            const now = Date.now();
+            const diff = target - now;
+            if (diff <= 0) {
+                document.getElementById('cd-days').textContent = '0';
+                document.getElementById('cd-hours').textContent = '0';
+                document.getElementById('cd-mins').textContent = '0';
+                document.getElementById('cd-secs').textContent = '0';
+                return;
+            }
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            document.getElementById('cd-days').textContent = d;
+            document.getElementById('cd-hours').textContent = h;
+            document.getElementById('cd-mins').textContent = m;
+            document.getElementById('cd-secs').textContent = s;
+        }
+        updateCD();
+        setInterval(updateCD, 1000);
+    </script>
+</body>
+</html>
