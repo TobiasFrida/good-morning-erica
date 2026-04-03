@@ -67,6 +67,12 @@
         .heart-burst { position: fixed; pointer-events: none; z-index: 10; font-size: 18px; animation: burstOut 0.8s ease-out forwards; }
         @keyframes burstOut { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--bx), var(--by)) scale(0.3); opacity: 0; } }
         
+        /* Firework */
+        .firework-trail { position: fixed; pointer-events: none; z-index: 10; width: 4px; height: 4px; border-radius: 50%; animation: rocketUp var(--dur) ease-out forwards; }
+        @keyframes rocketUp { 0% { transform: translateY(0); opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(var(--ry)); opacity: 0; } }
+        .firework-spark { position: fixed; pointer-events: none; z-index: 10; width: 5px; height: 5px; border-radius: 50%; animation: sparkBurst 1s ease-out forwards; }
+        @keyframes sparkBurst { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; } }
+        
         /* Content — never behind water */
         .content { position: relative; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 30px 20px 32vh; text-align: center; }
         
@@ -288,6 +294,48 @@
         }
         
         animate();
+        
+        // Fireworks from bottom on page click
+        const fwColors = ['#ff6b9d','#c850c0','#4158d0','#ff2d95','#ffd700','#00e5ff','#ff4757','#7bed9f'];
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.bubble')) return; // bubbles have their own effect
+            const startX = e.clientX;
+            const startY = H();
+            const endY = 100 + Math.random() * (H() * 0.4);
+            const color = fwColors[Math.floor(Math.random() * fwColors.length)];
+            
+            // Trail going up
+            const trail = document.createElement('div');
+            trail.className = 'firework-trail';
+            trail.style.left = startX + 'px';
+            trail.style.top = startY + 'px';
+            trail.style.background = color;
+            trail.style.boxShadow = `0 0 6px ${color}`;
+            trail.style.setProperty('--dur', '0.5s');
+            trail.style.setProperty('--ry', -(startY - endY) + 'px');
+            document.body.appendChild(trail);
+            
+            // Explosion after trail
+            setTimeout(() => {
+                trail.remove();
+                const sparkCount = 20 + Math.floor(Math.random() * 15);
+                for (let i = 0; i < sparkCount; i++) {
+                    const s = document.createElement('div');
+                    s.className = 'firework-spark';
+                    s.style.left = startX + 'px';
+                    s.style.top = endY + 'px';
+                    s.style.background = color;
+                    s.style.boxShadow = `0 0 4px ${color}`;
+                    const angle = (Math.PI * 2 / sparkCount) * i + (Math.random() * 0.3);
+                    const dist = 40 + Math.random() * 80;
+                    s.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+                    s.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+                    s.style.animationDelay = (Math.random() * 0.1) + 's';
+                    document.body.appendChild(s);
+                    setTimeout(() => s.remove(), 1200);
+                }
+            }, 450);
+        });
         
         // Heart explosion on bubble click
         const hearts = ['💖', '💗', '💕', '❤️', '💘', '💝', '💓', '💞'];
