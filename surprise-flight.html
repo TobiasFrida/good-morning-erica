@@ -21,8 +21,8 @@
             width: 90px; height: 90px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 1px;
-            animation: floatBubble var(--dur) ease-in-out infinite alternate;
             pointer-events: none;
+            transition: none;
         }
         .bubble::before {
             content: '';
@@ -33,14 +33,6 @@
         }
         .bubble .emoji { font-size: 22px; line-height: 1; }
         .bubble .text { font-size: 8px; color: #c0d8f0; font-weight: 400; text-align: center; line-height: 1.1; max-width: 60px; overflow: hidden; }
-        
-        @keyframes floatBubble {
-            0% { transform: translate(0, 0); }
-            25% { transform: translate(var(--dx1), var(--dy1)); }
-            50% { transform: translate(var(--dx2), var(--dy2)); }
-            75% { transform: translate(var(--dx3), var(--dy3)); }
-            100% { transform: translate(var(--dx4), var(--dy4)); }
-        }
         
         /* Content */
         .content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px 20px; text-align: center; }
@@ -156,7 +148,7 @@
         function updateCD() { const d=Math.max(0,target-Date.now()); document.getElementById('cd-days').textContent=Math.floor(d/864e5); document.getElementById('cd-hours').textContent=Math.floor((d%864e5)/36e5); document.getElementById('cd-mins').textContent=Math.floor((d%36e5)/6e4); document.getElementById('cd-secs').textContent=Math.floor((d%6e4)/1e3); }
         updateCD(); setInterval(updateCD, 1000);
         
-        // Round cute floating bubbles
+        // Physics-based floating bubbles with collision avoidance
         const activities = [
             ["🍣", "Sushi"], ["🛒", "Market"], ["🌺", "Flowers"], ["🍓", "Berries"],
             ["🍜", "Ramen"], ["🥾", "Hike"], ["🍸", "Speakeasy"], ["🏖️", "Beach"],
@@ -166,24 +158,104 @@
             ["🐠", "Aquarium"], ["🌅", "Sunset"]
         ];
         
+        // Collect text zones to avoid
+        function getTextZones() {
+            const zones = [];
+            document.querySelectorAll('.intro, .timeline, .countdown, .final-message, .globe-wrap').forEach(el => {
+                const r = el.getBoundingClientRect();
+                zones.push({ x: r.left - 20, y: r.top - 20, w: r.width + 40, h: r.height + 40 });
+            });
+            return zones;
+        }
+        
+        const bubbles = [];
+        const W = () => window.innerWidth;
+        const H = () => window.innerHeight;
+        const SIZE = 90;
+        
         activities.forEach((a, i) => {
-            const b = document.createElement('div');
-            b.className = 'bubble';
-            b.innerHTML = `<span class="emoji">${a[0]}</span><span class="text">${a[1]}</span>`;
+            const el = document.createElement('div');
+            el.className = 'bubble';
+            el.innerHTML = `<span class="emoji">${a[0]}</span><span class="text">${a[1]}</span>`;
+            document.body.appendChild(el);
             
-            b.style.left = (3 + Math.random() * 88) + '%';
-            b.style.top = (3 + Math.random() * 88) + '%';
-            b.style.setProperty('--dur', (14 + Math.random() * 10) + 's');
-            b.style.animationDelay = (i * 0.25) + 's';
-            
-            const r = () => (Math.random() * 200 - 100) + 'px';
-            b.style.setProperty('--dx1', r()); b.style.setProperty('--dy1', r());
-            b.style.setProperty('--dx2', r()); b.style.setProperty('--dy2', r());
-            b.style.setProperty('--dx3', r()); b.style.setProperty('--dy3', r());
-            b.style.setProperty('--dx4', r()); b.style.setProperty('--dy4', r());
-            
-            document.body.appendChild(b);
+            const speed = 0.3 + Math.random() * 0.4;
+            const angle = Math.random() * Math.PI * 2;
+            bubbles.push({
+                el,
+                x: Math.random() * (W() - SIZE),
+                y: Math.random() * (H() - SIZE),
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed
+            });
         });
+        
+        let textZones = getTextZones();
+        window.addEventListener('resize', () => { textZones = getTextZones(); });
+        // Refresh zones periodically (scroll changes positions)
+        setInterval(() => { textZones = getTextZones(); }, 2000);
+        
+        function rectsOverlap(ax, ay, bx, by, bw, bh) {
+            return ax < bx + bw && ax + SIZE > bx && ay < by + bh && ay + SIZE > by;
+        }
+        
+        function animate() {
+            bubbles.forEach(b => {
+                let nx = b.x + b.vx;
+                let ny = b.y + b.vy;
+                
+                // Bounce off screen edges
+                if (nx < 0 || nx > W() - SIZE) { b.vx *= -1; nx = b.x + b.vx; }
+                if (ny < 0 || ny > H() - SIZE) { b.vy *= -1; ny = b.y + b.vy; }
+                
+                // Bounce off text zones
+                for (const z of textZones) {
+                    if (rectsOverlap(nx, ny, z.x, z.y, z.w, z.h)) {
+                        // Find which side we're hitting and bounce
+                        const cx = nx + SIZE / 2;
+                        const cy = ny + SIZE / 2;
+                        const zx = z.x + z.w / 2;
+                        const zy = z.y + z.h / 2;
+                        const dx = cx - zx;
+                        const dy = cy - zy;
+                        
+                        if (Math.abs(dx / z.w) > Math.abs(dy / z.h)) {
+                            b.vx = Math.abs(b.vx) * Math.sign(dx);
+                        } else {
+                            b.vy = Math.abs(b.vy) * Math.sign(dy);
+                        }
+                        nx = b.x + b.vx;
+                        ny = b.y + b.vy;
+                        break;
+                    }
+                }
+                
+                b.x = nx;
+                b.y = ny;
+                b.el.style.left = b.x + 'px';
+                b.el.style.top = b.y + 'px';
+            });
+            requestAnimationFrame(animate);
+        }
+        
+        // Initial placement — push out of text zones
+        setTimeout(() => {
+            textZones = getTextZones();
+            bubbles.forEach(b => {
+                let tries = 0;
+                while (tries < 50) {
+                    let overlap = false;
+                    for (const z of textZones) {
+                        if (rectsOverlap(b.x, b.y, z.x, z.y, z.w, z.h)) { overlap = true; break; }
+                    }
+                    if (!overlap) break;
+                    b.x = Math.random() * (W() - SIZE);
+                    b.y = Math.random() * (H() - SIZE);
+                    tries++;
+                }
+            });
+            animate();
+        }, 500);
     </script>
 </body>
 </html>
