@@ -15,9 +15,23 @@
         .bg-collage img { width: 100%; height: 100%; object-fit: cover; }
         .bg-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,10,26,0.82); z-index: 1; backdrop-filter: blur(3px); }
         
-        /* Cute bubble with image */
+        /* Ocean */
+        .ocean { position: fixed; bottom: 0; left: 0; right: 0; height: 30vh; z-index: 4; pointer-events: none; }
+        .ocean-water { position: absolute; bottom: 0; left: 0; right: 0; height: 100%; background: linear-gradient(180deg, rgba(0,60,120,0.0) 0%, rgba(0,60,120,0.4) 10%, rgba(0,40,90,0.7) 40%, rgba(0,25,60,0.85) 100%); }
+        /* Wave SVG */
+        .wave { position: absolute; top: -20px; left: 0; width: 200%; height: 40px; animation: waveMove 8s linear infinite; }
+        .wave svg { width: 100%; height: 100%; }
+        .wave2 { animation-duration: 12s; animation-direction: reverse; top: -14px; opacity: 0.5; }
+        @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        
+        /* Light rays in water */
+        .ocean-rays { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; opacity: 0.15; }
+        .ray { position: absolute; top: -10px; width: 40px; height: 120%; background: linear-gradient(180deg, rgba(100,200,255,0.5), transparent 70%); transform: rotate(5deg); filter: blur(10px); animation: rayShimmer 4s ease-in-out infinite alternate; }
+        @keyframes rayShimmer { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+        
+        /* Bubbles */
         .bubble {
-            position: fixed; z-index: 2;
+            position: fixed; z-index: 5;
             width: 85px; height: 85px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 2px;
@@ -27,7 +41,6 @@
             border: 1.5px solid rgba(150,210,255,0.3);
             box-shadow: inset 0 -8px 16px rgba(100,180,240,0.1), inset 4px 4px 10px rgba(255,255,255,0.15), 0 0 20px rgba(100,180,240,0.08);
         }
-        /* Shine/reflection */
         .bubble::before {
             content: '';
             position: absolute;
@@ -50,40 +63,19 @@
         .bubble .text { font-size: 8px; color: #c0d8f0; font-weight: 400; text-align: center; line-height: 1.1; max-width: 60px; overflow: hidden; position: relative; z-index: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         
         /* Content */
-        .content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px 20px; text-align: center; }
+        .content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 30px 20px; text-align: center; }
         
         .intro { margin-bottom: 20px; animation: fadeIn 1.5s ease; }
         .intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 48px); background: linear-gradient(135deg, #ff6b9d, #c850c0, #4158d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
         .intro p { font-size: 15px; color: #a0a0c0; font-weight: 300; }
         .date-badge { display: inline-block; background: rgba(200,80,192,0.15); border: 1px solid rgba(200,80,192,0.3); padding: 6px 20px; border-radius: 50px; font-size: 13px; color: #c850c0; margin-top: 14px; letter-spacing: 2px; }
         
-        /* Globe — remove white BG with mix-blend-mode */
-        .globe-wrap { position: relative; margin: 20px auto; width: clamp(280px, 45vw, 400px); }
-        .globe-img {
-            width: 100%; height: auto;
-            border-radius: 50%;
-            mix-blend-mode: screen;
-            filter: drop-shadow(0 0 30px rgba(65,88,208,0.3));
-        }
-        
-        /* Pins — positioned on the globe map accurately */
-        .pin { position: absolute; text-align: center; transform: translate(-50%, -50%); z-index: 4; }
-        .pin-dot { width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 2px; position: relative; }
-        .pin-dot.start { background: #4158d0; box-shadow: 0 0 12px #4158d0; }
-        .pin-dot.mid { background: #c850c0; box-shadow: 0 0 12px #c850c0; }
-        .pin-dot.dest { background: #ff6b9d; box-shadow: 0 0 16px #ff6b9d; width: 14px; height: 14px; animation: pulseDot 1.5s ease-in-out infinite; }
-        @keyframes pulseDot { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
-        .pin-ring { position: absolute; top: 50%; left: 50%; width: 26px; height: 26px; border: 1.5px solid #ff6b9d; border-radius: 50%; transform: translate(-50%,-50%); animation: ringPulse 2s ease-in-out infinite; pointer-events: none; }
-        @keyframes ringPulse { 0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.5; } 50% { transform: translate(-50%,-50%) scale(2); opacity: 0; } }
-        .pin-label { font-size: 9px; font-weight: 600; color: #fff; white-space: nowrap; text-shadow: 0 1px 6px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.7); }
-        
-        /* Flight arcs */
-        .flight-arcs { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
-        .arc { fill: none; stroke-width: 2; stroke-dasharray: 6 4; animation: dashFlow 15s linear infinite; }
-        @keyframes dashFlow { to { stroke-dashoffset: -200; } }
+        /* Globe */
+        .globe-wrap { position: relative; margin: 20px auto; width: clamp(250px, 40vw, 360px); }
+        .globe-img { width: 100%; height: auto; border-radius: 50%; mix-blend-mode: screen; filter: drop-shadow(0 0 30px rgba(65,88,208,0.3)); }
         
         /* Timeline */
-        .timeline { display: flex; align-items: center; justify-content: center; gap: 0; margin: 20px auto; flex-wrap: wrap; }
+        .timeline { display: flex; align-items: center; justify-content: center; gap: 0; margin: 16px auto; flex-wrap: wrap; }
         .tl-stop { text-align: center; padding: 6px 10px; }
         .tl-city { font-size: 11px; font-weight: 600; color: #e0e0f0; }
         .tl-time { font-size: 9px; color: #808098; margin-top: 2px; }
@@ -92,27 +84,26 @@
         .tl-sep { color: #c850c0; font-size: 10px; padding: 0 2px; }
         
         /* Countdown */
-        .countdown { margin: 20px auto; }
+        .countdown { margin: 16px auto; }
         .countdown-label { font-size: 11px; color: #808098; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
         .countdown-boxes { display: flex; justify-content: center; gap: 10px; }
-        .cd-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(200,80,192,0.2); border-radius: 10px; padding: 12px 16px; min-width: 58px; }
-        .cd-num { font-family: 'Playfair Display', serif; font-size: 24px; color: #c850c0; }
+        .cd-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(200,80,192,0.2); border-radius: 10px; padding: 10px 14px; min-width: 55px; }
+        .cd-num { font-family: 'Playfair Display', serif; font-size: 22px; color: #c850c0; }
         .cd-label { font-size: 10px; color: #808098; margin-top: 2px; }
         
         /* Final */
-        .final-message { margin-top: 20px; padding: 20px; }
-        .final-message p { font-size: 16px; line-height: 1.8; color: #d0d0e8; font-weight: 300; }
-        .final-message .signature { margin-top: 14px; font-family: 'Playfair Display', serif; font-size: 22px; color: #ff6b9d; }
+        .final-message { margin-top: 16px; padding: 16px; }
+        .final-message p { font-size: 15px; line-height: 1.8; color: #d0d0e8; font-weight: 300; }
+        .final-message .signature { margin-top: 12px; font-family: 'Playfair Display', serif; font-size: 20px; color: #ff6b9d; }
         
         /* Falling stars and hearts */
         .falling {
-            position: fixed; z-index: 1;
+            position: fixed; z-index: 2;
             top: -30px;
             color: #ff2d95;
             pointer-events: none;
             animation: fall var(--dur) linear infinite;
             animation-delay: var(--delay);
-            opacity: 0.7;
             font-size: var(--size);
         }
         @keyframes fall {
@@ -132,6 +123,25 @@
     </div>
     <div class="bg-overlay"></div>
     
+    <!-- OCEAN -->
+    <div class="ocean">
+        <div class="wave">
+            <svg viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0,20 C150,0 350,40 600,20 C850,0 1050,40 1200,20 L1200,40 L0,40 Z" fill="rgba(0,60,120,0.5)"/></svg>
+        </div>
+        <div class="wave wave2">
+            <svg viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0,25 C200,10 400,35 600,20 C800,5 1000,35 1200,20 L1200,40 L0,40 Z" fill="rgba(0,40,90,0.3)"/></svg>
+        </div>
+        <div class="ocean-water"></div>
+        <div class="ocean-rays">
+            <div class="ray" style="left:10%; animation-delay:0s;"></div>
+            <div class="ray" style="left:25%; animation-delay:1s; width:30px;"></div>
+            <div class="ray" style="left:45%; animation-delay:2s;"></div>
+            <div class="ray" style="left:60%; animation-delay:0.5s; width:50px;"></div>
+            <div class="ray" style="left:78%; animation-delay:1.5s;"></div>
+            <div class="ray" style="left:90%; animation-delay:3s; width:35px;"></div>
+        </div>
+    </div>
+    
     <div class="content">
         <div class="intro">
             <h1>I'm On My Way To You</h1>
@@ -139,14 +149,10 @@
             <div class="date-badge">APRIL 9 – 22, 2026</div>
         </div>
         
-        <!-- GLOBE -->
         <div class="globe-wrap">
             <img src="globe.png" class="globe-img" alt="">
-            
-            <!-- Clean globe, no pins -->
         </div>
         
-        <!-- Timeline -->
         <div class="timeline">
             <div class="tl-stop"><div class="tl-dot s"></div><div class="tl-city">Umeå 🇸🇪</div><div class="tl-time">8:35 AM</div></div>
             <div class="tl-sep">→ 1h15m →</div>
@@ -157,7 +163,6 @@
             <div class="tl-stop"><div class="tl-dot e"></div><div class="tl-city">San Diego 💕</div><div class="tl-time">11:33 PM</div></div>
         </div>
         
-        <!-- Countdown -->
         <div class="countdown">
             <div class="countdown-label">Countdown to Takeoff</div>
             <div class="countdown-boxes">
@@ -168,7 +173,6 @@
             </div>
         </div>
         
-        <!-- Final -->
         <div class="final-message">
             <p>14 days of adventures, food comas,<br>cozy days, sunset kisses, and you.<br><br>I would fly 23 hours across the world<br>just to hold you for one second.<br><br>But I'm coming for way more than a second. 😏💕</p>
             <div class="signature">— Tobias ❤️</div>
@@ -195,7 +199,7 @@
             document.body.appendChild(el);
         }
         
-        // Physics-based floating bubbles with collision avoidance
+        // Physics bubbles — swim UNDER ocean surface, bounce off each other
         const activities = [
             ["🍣", "Sushi"], ["🛒", "Market"], ["🌺", "Flowers"], ["🍓", "Berries"],
             ["🍜", "Ramen"], ["🥾", "Hike"], ["🍸", "Speakeasy"], ["🏖️", "Beach"],
@@ -205,20 +209,14 @@
             ["🐠", "Aquarium"], ["🌅", "Sunset"]
         ];
         
-        // Collect text zones to avoid
-        function getTextZones() {
-            const zones = [];
-            document.querySelectorAll('.intro, .timeline, .countdown, .final-message, .globe-wrap').forEach(el => {
-                const r = el.getBoundingClientRect();
-                zones.push({ x: r.left - 20, y: r.top - 20, w: r.width + 40, h: r.height + 40 });
-            });
-            return zones;
-        }
-        
         const bubbles = [];
         const W = () => window.innerWidth;
         const H = () => window.innerHeight;
-        const SIZE = 90;
+        const SIZE = 85;
+        const R = SIZE / 2;
+        
+        // Ocean zone: bottom 30% of viewport
+        const oceanTop = () => H() * 0.70;
         
         activities.forEach((a, i) => {
             const el = document.createElement('div');
@@ -226,83 +224,80 @@
             el.innerHTML = `<span class="emoji">${a[0]}</span><span class="text">${a[1]}</span>`;
             document.body.appendChild(el);
             
-            const speed = 0.3 + Math.random() * 0.4;
+            const speed = 0.3 + Math.random() * 0.5;
             const angle = Math.random() * Math.PI * 2;
+            // Place in ocean zone
+            const ot = oceanTop();
             bubbles.push({
                 el,
                 x: Math.random() * (W() - SIZE),
-                y: Math.random() * (H() - SIZE),
+                y: ot + Math.random() * (H() - ot - SIZE),
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed
             });
         });
         
-        let textZones = getTextZones();
-        window.addEventListener('resize', () => { textZones = getTextZones(); });
-        // Refresh zones periodically (scroll changes positions)
-        setInterval(() => { textZones = getTextZones(); }, 2000);
-        
-        function rectsOverlap(ax, ay, bx, by, bw, bh) {
-            return ax < bx + bw && ax + SIZE > bx && ay < by + bh && ay + SIZE > by;
-        }
-        
         function animate() {
-            bubbles.forEach(b => {
-                let nx = b.x + b.vx;
-                let ny = b.y + b.vy;
+            const ot = oceanTop();
+            
+            bubbles.forEach((b, i) => {
+                b.x += b.vx;
+                b.y += b.vy;
                 
-                // Bounce off screen edges
-                if (nx < 0 || nx > W() - SIZE) { b.vx *= -1; nx = b.x + b.vx; }
-                if (ny < 0 || ny > H() - SIZE) { b.vy *= -1; ny = b.y + b.vy; }
+                // Bounce off screen edges (left/right)
+                if (b.x < 0) { b.x = 0; b.vx *= -1; }
+                if (b.x > W() - SIZE) { b.x = W() - SIZE; b.vx *= -1; }
                 
-                // Bounce off text zones
-                for (const z of textZones) {
-                    if (rectsOverlap(nx, ny, z.x, z.y, z.w, z.h)) {
-                        // Find which side we're hitting and bounce
-                        const cx = nx + SIZE / 2;
-                        const cy = ny + SIZE / 2;
-                        const zx = z.x + z.w / 2;
-                        const zy = z.y + z.h / 2;
-                        const dx = cx - zx;
-                        const dy = cy - zy;
+                // Keep in ocean zone (bounce off surface and bottom)
+                if (b.y < ot) { b.y = ot; b.vy *= -1; }
+                if (b.y > H() - SIZE) { b.y = H() - SIZE; b.vy *= -1; }
+                
+                // Bounce off other bubbles (circle collision)
+                for (let j = i + 1; j < bubbles.length; j++) {
+                    const o = bubbles[j];
+                    const dx = (b.x + R) - (o.x + R);
+                    const dy = (b.y + R) - (o.y + R);
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const minDist = SIZE;
+                    
+                    if (dist < minDist && dist > 0) {
+                        // Normalize collision vector
+                        const nx = dx / dist;
+                        const ny = dy / dist;
                         
-                        if (Math.abs(dx / z.w) > Math.abs(dy / z.h)) {
-                            b.vx = Math.abs(b.vx) * Math.sign(dx);
-                        } else {
-                            b.vy = Math.abs(b.vy) * Math.sign(dy);
+                        // Relative velocity
+                        const dvx = b.vx - o.vx;
+                        const dvy = b.vy - o.vy;
+                        const dvn = dvx * nx + dvy * ny;
+                        
+                        // Only resolve if moving toward each other
+                        if (dvn < 0) {
+                            b.vx -= dvn * nx;
+                            b.vy -= dvn * ny;
+                            o.vx += dvn * nx;
+                            o.vy += dvn * ny;
                         }
-                        nx = b.x + b.vx;
-                        ny = b.y + b.vy;
-                        break;
+                        
+                        // Separate overlapping bubbles
+                        const overlap = (minDist - dist) / 2;
+                        b.x += nx * overlap;
+                        b.y += ny * overlap;
+                        o.x -= nx * overlap;
+                        o.y -= ny * overlap;
                     }
                 }
                 
-                b.x = nx;
-                b.y = ny;
+                // Add gentle wobble (underwater feel)
+                b.x += Math.sin(Date.now() * 0.001 + i) * 0.1;
+                
                 b.el.style.left = b.x + 'px';
                 b.el.style.top = b.y + 'px';
             });
+            
             requestAnimationFrame(animate);
         }
         
-        // Initial placement — push out of text zones
-        setTimeout(() => {
-            textZones = getTextZones();
-            bubbles.forEach(b => {
-                let tries = 0;
-                while (tries < 50) {
-                    let overlap = false;
-                    for (const z of textZones) {
-                        if (rectsOverlap(b.x, b.y, z.x, z.y, z.w, z.h)) { overlap = true; break; }
-                    }
-                    if (!overlap) break;
-                    b.x = Math.random() * (W() - SIZE);
-                    b.y = Math.random() * (H() - SIZE);
-                    tries++;
-                }
-            });
-            animate();
-        }, 500);
+        animate();
     </script>
 </body>
 </html>
