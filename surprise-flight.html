@@ -7,144 +7,93 @@
     <title>💕</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400&display=swap');
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #0a0a1a;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
+        body { background: #0a0a1a; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; min-height: 100vh; }
         
         .stars { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
         .star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: twinkle var(--dur) ease-in-out infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
         
-        .container { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 40px 20px; text-align: center; }
+        .floating-hearts { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .fheart { position: absolute; bottom: -50px; opacity: 0; animation: floatUp var(--dur) var(--delay) ease-in infinite; }
+        @keyframes floatUp { 0% { opacity: 0; transform: translateY(0); } 10% { opacity: 0.5; } 90% { opacity: 0.5; } 100% { opacity: 0; transform: translateY(-100vh) rotate(45deg); } }
+        
+        .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 40px 20px; text-align: center; }
         
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
         .reveal.visible { opacity: 1; transform: translateY(0); }
         
-        .intro { margin-bottom: 60px; }
-        .intro h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(28px, 6vw, 48px);
-            background: linear-gradient(135deg, #ff6b9d, #c850c0, #4158d0);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 16px;
-        }
+        .intro { margin-bottom: 50px; }
+        .intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 48px); background: linear-gradient(135deg, #ff6b9d, #c850c0, #4158d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
         .intro p { font-size: 16px; color: #a0a0c0; font-weight: 300; }
-        .date-badge {
-            display: inline-block; background: rgba(200,80,192,0.15); border: 1px solid rgba(200,80,192,0.3);
-            padding: 8px 24px; border-radius: 50px; font-size: 14px; color: #c850c0; margin-top: 20px; letter-spacing: 2px;
-        }
+        .date-badge { display: inline-block; background: rgba(200,80,192,0.15); border: 1px solid rgba(200,80,192,0.3); padding: 8px 24px; border-radius: 50px; font-size: 14px; color: #c850c0; margin-top: 20px; letter-spacing: 2px; }
         
-        /* Flight cards */
-        .flight-path { position: relative; margin: 40px 0; }
-        .leg-card {
-            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
-            padding: 30px; margin: 20px 0; transition: transform 0.3s;
-        }
+        /* Two column layout */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; text-align: left; }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+        
+        .col-header { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 20px; text-align: center; }
+        .col-header span { background: linear-gradient(135deg, #ff6b9d, #c850c0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Flight cards (left) */
+        .flight-col { position: relative; }
+        .leg-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin-bottom: 14px; transition: transform 0.3s; }
         .leg-card:hover { transform: scale(1.02); }
-        .leg-number {
-            width: 40px; height: 40px; background: linear-gradient(135deg, #4158d0, #c850c0);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px; font-weight: 700; font-size: 16px;
-        }
-        .route { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px; }
-        .city { font-family: 'Playfair Display', serif; font-size: 22px; }
-        .plane-icon { font-size: 24px; animation: fly 2s ease-in-out infinite; }
-        @keyframes fly { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(8px); } }
-        .leg-details { display: flex; justify-content: center; gap: 24px; color: #a0a0c0; font-size: 13px; margin-bottom: 12px; }
-        .leg-message { font-style: italic; color: #c0c0e0; font-size: 14px; margin-top: 12px; opacity: 0.8; }
+        .leg-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .leg-num { width: 28px; height: 28px; background: linear-gradient(135deg, #4158d0, #c850c0); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+        .route { display: flex; align-items: center; gap: 8px; }
+        .city { font-family: 'Playfair Display', serif; font-size: 17px; }
+        .plane-icon { font-size: 16px; animation: fly 2s ease-in-out infinite; }
+        @keyframes fly { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+        .leg-details { display: flex; gap: 16px; color: #a0a0c0; font-size: 12px; margin-bottom: 6px; padding-left: 38px; }
+        .leg-message { font-style: italic; color: #c0c0e0; font-size: 12px; opacity: 0.7; padding-left: 38px; }
         
-        .stopover { padding: 16px; }
-        .stopover-dot { width: 12px; height: 12px; background: #c850c0; border-radius: 50%; margin: 0 auto 8px; box-shadow: 0 0 20px rgba(200,80,192,0.5); }
-        .stopover-text { font-size: 12px; color: #808098; }
+        .stopover { text-align: center; padding: 8px 0; }
+        .stopover-dot { width: 8px; height: 8px; background: #c850c0; border-radius: 50%; margin: 0 auto 4px; box-shadow: 0 0 12px rgba(200,80,192,0.5); }
+        .stopover-text { font-size: 11px; color: #808098; }
         
-        /* Destination */
-        .destination { margin-top: 60px; }
-        .destination h2 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 5vw, 40px); margin-bottom: 16px; }
-        .heart { font-size: 60px; display: inline-block; animation: heartbeat 1.2s ease-in-out infinite; }
+        .landing-box { text-align: center; margin-top: 16px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid rgba(200,80,192,0.15); }
+        .landing-box .heart { font-size: 36px; animation: heartbeat 1.2s ease-in-out infinite; }
         @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        .landing-box h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin: 8px 0 4px; }
+        .landing-box p { font-size: 12px; color: #a0a0c0; }
         
-        /* Countdown */
-        .countdown { margin-top: 40px; }
-        .countdown-label { font-size: 13px; color: #808098; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; }
-        .countdown-boxes { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-        .cd-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(200,80,192,0.2); border-radius: 12px; padding: 16px 20px; min-width: 70px; }
-        .cd-num { font-family: 'Playfair Display', serif; font-size: 32px; color: #c850c0; }
-        .cd-label { font-size: 11px; color: #808098; margin-top: 4px; }
+        .countdown { margin-top: 20px; text-align: center; }
+        .countdown-label { font-size: 11px; color: #808098; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+        .countdown-boxes { display: flex; justify-content: center; gap: 8px; }
+        .cd-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(200,80,192,0.2); border-radius: 10px; padding: 10px 14px; min-width: 55px; text-align: center; }
+        .cd-num { font-family: 'Playfair Display', serif; font-size: 22px; color: #c850c0; }
+        .cd-label { font-size: 10px; color: #808098; margin-top: 2px; }
         
-        /* Divider */
-        .section-divider {
-            margin: 80px auto; width: 200px; height: 1px;
-            background: linear-gradient(90deg, transparent, #c850c0, transparent);
-        }
+        /* Itinerary (right) */
+        .itinerary-col { max-height: 700px; overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: #c850c044 transparent; }
+        .itinerary-col::-webkit-scrollbar { width: 4px; }
+        .itinerary-col::-webkit-scrollbar-thumb { background: #c850c044; border-radius: 4px; }
         
-        /* Itinerary */
-        .itinerary-header { margin-bottom: 40px; }
-        .itinerary-header h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(24px, 5vw, 38px);
-            background: linear-gradient(135deg, #ff6b9d, #c850c0);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-        .itinerary-header p { color: #a0a0c0; font-size: 15px; font-weight: 300; }
-        
-        .day-card {
-            background: rgba(255,255,255,0.04); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;
-            padding: 24px; margin: 16px 0; text-align: left; transition: transform 0.3s, border-color 0.3s;
-        }
+        .day-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; margin-bottom: 10px; transition: transform 0.3s, border-color 0.3s; }
         .day-card:hover { transform: translateY(-2px); border-color: rgba(200,80,192,0.3); }
         
-        .day-header {
-            display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
-            padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .day-date {
-            background: linear-gradient(135deg, #4158d0, #c850c0);
-            border-radius: 10px; padding: 8px 14px; text-align: center; min-width: 52px;
-        }
-        .day-date .num { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; line-height: 1; }
-        .day-date .mon { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.8; }
-        .day-label { font-family: 'Playfair Display', serif; font-size: 18px; flex: 1; }
-        .day-emoji { font-size: 24px; }
+        .day-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .day-date { background: linear-gradient(135deg, #4158d0, #c850c0); border-radius: 8px; padding: 5px 10px; text-align: center; min-width: 42px; }
+        .day-date .num { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; line-height: 1; }
+        .day-date .mon { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.8; }
+        .day-label { font-family: 'Playfair Display', serif; font-size: 15px; flex: 1; }
+        .day-emoji { font-size: 18px; }
         
-        .day-tag {
-            display: inline-block; background: rgba(200,80,192,0.15); border: 1px solid rgba(200,80,192,0.25);
-            padding: 4px 12px; border-radius: 20px; font-size: 11px; color: #c850c0;
-            margin-bottom: 12px; letter-spacing: 1px;
-        }
+        .day-tag { display: inline-block; background: rgba(200,80,192,0.15); border: 1px solid rgba(200,80,192,0.25); padding: 2px 10px; border-radius: 20px; font-size: 10px; color: #c850c0; margin-bottom: 8px; letter-spacing: 1px; }
         
         .event-list { list-style: none; }
-        .event-list li {
-            padding: 8px 0; display: flex; align-items: flex-start; gap: 10px;
-            font-size: 14px; color: #c0c0e0; font-weight: 300;
-        }
+        .event-list li { padding: 5px 0; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #c0c0e0; font-weight: 300; }
         .event-list li + li { border-top: 1px solid rgba(255,255,255,0.03); }
-        .event-time { color: #808098; font-size: 12px; min-width: 50px; padding-top: 1px; }
-        .event-icon { font-size: 16px; }
+        .event-time { color: #808098; font-size: 11px; min-width: 45px; }
+        .event-icon { font-size: 14px; }
+        .special-tag { display: inline-block; background: rgba(255,107,157,0.15); border: 1px solid rgba(255,107,157,0.3); padding: 1px 8px; border-radius: 20px; font-size: 9px; color: #ff6b9d; margin-left: 6px; }
         
-        .special-tag {
-            display: inline-block; background: rgba(255,107,157,0.15); border: 1px solid rgba(255,107,157,0.3);
-            padding: 3px 10px; border-radius: 20px; font-size: 10px; color: #ff6b9d; margin-left: 8px;
-        }
-        
-        /* Final */
-        .final-message { margin-top: 60px; padding: 30px; }
+        /* Final message */
+        .section-divider { margin: 50px auto; width: 200px; height: 1px; background: linear-gradient(90deg, transparent, #c850c0, transparent); }
+        .final-message { padding: 30px; text-align: center; }
         .final-message p { font-size: 18px; line-height: 1.8; color: #d0d0e8; font-weight: 300; }
         .final-message .signature { margin-top: 20px; font-family: 'Playfair Display', serif; font-size: 22px; color: #ff6b9d; }
-        
-        .floating-hearts { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-        .fheart { position: absolute; bottom: -50px; opacity: 0; animation: floatUp var(--dur) var(--delay) ease-in infinite; }
-        @keyframes floatUp { 0% { opacity: 0; transform: translateY(0) rotate(0); } 10% { opacity: 0.5; } 90% { opacity: 0.5; } 100% { opacity: 0; transform: translateY(-100vh) rotate(45deg); } }
-        
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -152,254 +101,169 @@
     <div class="floating-hearts" id="hearts"></div>
     
     <div class="container">
-        <!-- INTRO -->
         <div class="intro reveal">
             <h1>I'm On My Way To You</h1>
             <p>Every mile is one step closer to your arms</p>
-            <div class="date-badge">APRIL 9 – 23, 2026</div>
+            <div class="date-badge">APRIL 9 – 22, 2026</div>
         </div>
         
-        <!-- FLIGHTS -->
-        <div class="flight-path">
-            <div class="reveal leg-card">
-                <div class="leg-number">1</div>
-                <div class="route"><span class="city">Umeå</span><span class="plane-icon">✈️</span><span class="city">Helsinki</span></div>
-                <div class="leg-details"><span>🕐 8:35 AM → 10:50 AM</span><span>⏱ 1h 15m</span></div>
-                <div class="leg-message">"Leaving home... but flying to my home."</div>
+        <div class="two-col">
+            <!-- LEFT: Flights -->
+            <div class="flight-col reveal">
+                <div class="col-header"><span>✈️ The Journey</span></div>
+                
+                <div class="leg-card">
+                    <div class="leg-top"><div class="leg-num">1</div><div class="route"><span class="city">Umeå</span><span class="plane-icon">✈️</span><span class="city">Helsinki</span></div></div>
+                    <div class="leg-details"><span>🕐 8:35 AM → 10:50 AM</span><span>⏱ 1h 15m</span></div>
+                    <div class="leg-message">"Leaving home... but flying to my home."</div>
+                </div>
+                
+                <div class="stopover"><div class="stopover-dot"></div><div class="stopover-text">5h 35m in Helsinki ☕</div></div>
+                
+                <div class="leg-card">
+                    <div class="leg-top"><div class="leg-num">2</div><div class="route"><span class="city">Helsinki</span><span class="plane-icon">✈️</span><span class="city">Chicago</span></div></div>
+                    <div class="leg-details"><span>🕐 4:25 PM → 5:50 PM</span><span>⏱ 9h 25m</span></div>
+                    <div class="leg-message">"Crossing the Atlantic... thinking of you."</div>
+                </div>
+                
+                <div class="stopover"><div class="stopover-dot"></div><div class="stopover-text">3h 10m in Chicago 🌆</div></div>
+                
+                <div class="leg-card">
+                    <div class="leg-top"><div class="leg-num">3</div><div class="route"><span class="city">Chicago</span><span class="plane-icon">✈️</span><span class="city">San Diego</span></div></div>
+                    <div class="leg-details"><span>🕐 9:00 PM → 11:33 PM</span><span>⏱ 4h 33m</span></div>
+                    <div class="leg-message">"The last leg... I can almost feel you."</div>
+                </div>
+                
+                <div class="landing-box">
+                    <div class="heart">💕</div>
+                    <h3>Landing in San Diego</h3>
+                    <p>23h 58m of flying — just to see your smile</p>
+                </div>
+                
+                <div class="countdown">
+                    <div class="countdown-label">Countdown to Takeoff</div>
+                    <div class="countdown-boxes">
+                        <div class="cd-box"><div class="cd-num" id="cd-days">--</div><div class="cd-label">days</div></div>
+                        <div class="cd-box"><div class="cd-num" id="cd-hours">--</div><div class="cd-label">hours</div></div>
+                        <div class="cd-box"><div class="cd-num" id="cd-mins">--</div><div class="cd-label">mins</div></div>
+                        <div class="cd-box"><div class="cd-num" id="cd-secs">--</div><div class="cd-label">secs</div></div>
+                    </div>
+                </div>
             </div>
             
-            <div class="reveal stopover"><div class="stopover-dot"></div><div class="stopover-text">5h 35m layover in Helsinki ☕</div></div>
-            
-            <div class="reveal leg-card">
-                <div class="leg-number">2</div>
-                <div class="route"><span class="city">Helsinki</span><span class="plane-icon">✈️</span><span class="city">Chicago</span></div>
-                <div class="leg-details"><span>🕐 4:25 PM → 5:50 PM</span><span>⏱ 9h 25m</span></div>
-                <div class="leg-message">"Crossing the Atlantic... every second thinking of you."</div>
+            <!-- RIGHT: Itinerary -->
+            <div class="reveal" style="animation-delay: 0.3s;">
+                <div class="col-header"><span>📅 Our Adventure</span></div>
+                <div class="itinerary-col">
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">10</div><div class="mon">APR</div></div><div class="day-label">First Night Together</div><div class="day-emoji">🍣</div></div>
+                        <div class="day-tag">ARRIVAL DAY</div>
+                        <ul class="event-list"><li><span class="event-time">19:30</span><span class="event-icon">🍣</span> Sushi Ota</li></ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">11</div><div class="mon">APR</div></div><div class="day-label">Flowers & Strawberries</div><div class="day-emoji">🌸</div></div>
+                        <ul class="event-list">
+                            <li><span class="event-time">11:00</span><span class="event-icon">🛒</span> Civita Park — Farmers Market</li>
+                            <li><span class="event-time">14:00</span><span class="event-icon">🌺</span> The Flower Fields (Carlsbad)</li>
+                            <li><span class="event-time">16:00</span><span class="event-icon">🍓</span> Strawberry Picking</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">12</div><div class="mon">APR</div></div><div class="day-label">Coastal Vibes</div><div class="day-emoji">🌊</div></div>
+                        <ul class="event-list">
+                            <li><span class="event-time">13:00</span><span class="event-icon">🍜</span> Wa Dining Okan</li>
+                            <li><span class="event-time">18:00</span><span class="event-icon">🥾</span> Torrey Pines</li>
+                            <li><span class="event-time">21:30</span><span class="event-icon">🍸</span> Raised by Wolves <span class="special-tag">SPEAKEASY</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">13</div><div class="mon">APR</div></div><div class="day-label">Coronado Island</div><div class="day-emoji">🏖️</div></div>
+                        <div class="day-tag">ALL DAY</div>
+                        <ul class="event-list">
+                            <li><span class="event-time">All day</span><span class="event-icon">🌴</span> Explore Coronado</li>
+                            <li><span class="event-time">18:00</span><span class="event-icon">🍫</span> Ghirardelli Sundae</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">14</div><div class="mon">APR</div></div><div class="day-label">Universal Studios</div><div class="day-emoji">⚡</div></div>
+                        <div class="day-tag">HARRY POTTER WORLD</div>
+                        <ul class="event-list">
+                            <li><span class="event-time">07:00</span><span class="event-icon">🧙</span> Harry Potter World</li>
+                            <li><span class="event-time">11:00</span><span class="event-icon">🍜</span> Phở Gà Go</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">15</div><div class="mon">APR</div></div><div class="day-label">Cozy Sofabed Day</div><div class="day-emoji">🛋️</div></div>
+                        <div class="day-tag">REST DAY</div>
+                        <ul class="event-list"><li><span class="event-time">All day</span><span class="event-icon">💤</span> Cuddles, movies & nothing</li></ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">16</div><div class="mon">APR</div></div><div class="day-label">BBQ Day</div><div class="day-emoji">🔥</div></div>
+                        <ul class="event-list"><li><span class="event-time">All day</span><span class="event-icon">🥩</span> SOTBBQ</li></ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">17</div><div class="mon">APR</div></div><div class="day-label">Balboa Park</div><div class="day-emoji">🌹</div></div>
+                        <ul class="event-list">
+                            <li><span class="event-time">Daytime</span><span class="event-icon">⛩️</span> Japanese Friendship Garden</li>
+                            <li><span class="event-time">Daytime</span><span class="event-icon">🌹</span> Rose Garden</li>
+                            <li><span class="event-time">18:30</span><span class="event-icon">🍜</span> Pho Duyen Mai</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">18</div><div class="mon">APR</div></div><div class="day-label">Little Italy & Pottery</div><div class="day-emoji">🎨</div></div>
+                        <ul class="event-list">
+                            <li><span class="event-time">11:00</span><span class="event-icon">🛒</span> Little Italy — Farmers Market</li>
+                            <li><span class="event-time">13:30</span><span class="event-icon">🥞</span> Morning Glory Brunch</li>
+                            <li><span class="event-time">16:00</span><span class="event-icon">🏺</span> Intro to Pottery <span class="special-tag">DATE</span></li>
+                            <li><span class="event-time">19:00</span><span class="event-icon">🍲</span> Tasty Pot</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">19</div><div class="mon">APR</div></div><div class="day-label">Valentine's Day</div><div class="day-emoji">💝</div></div>
+                        <div class="day-tag">💕 OUR VALENTINE'S</div>
+                        <ul class="event-list"><li><span class="event-time">19:30</span><span class="event-icon">🍝</span> Cesarina <span class="special-tag">ROMANTIC</span></li></ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">20</div><div class="mon">APR</div></div><div class="day-label">Picnic in the Park</div><div class="day-emoji">🧁</div></div>
+                        <ul class="event-list">
+                            <li><span class="event-time">16:00</span><span class="event-icon">🥐</span> Paris Baguette</li>
+                            <li><span class="event-time">18:00</span><span class="event-icon">🧺</span> Picnic with Cake — Kate Sessions</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">21</div><div class="mon">APR</div></div><div class="day-label">Cozy Sofabed Day #2</div><div class="day-emoji">🛋️</div></div>
+                        <div class="day-tag">REST DAY</div>
+                        <ul class="event-list"><li><span class="event-time">All day</span><span class="event-icon">🥰</span> Round two of being together</li></ul>
+                    </div>
+                    
+                    <div class="day-card">
+                        <div class="day-header"><div class="day-date"><div class="num">22</div><div class="mon">APR</div></div><div class="day-label">Aquarium & Sunset</div><div class="day-emoji">🐠</div></div>
+                        <ul class="event-list">
+                            <li><span class="event-time">15:45</span><span class="event-icon">🐠</span> Birch Aquarium</li>
+                            <li><span class="event-time">Sunset</span><span class="event-icon">🌅</span> Watch the sunset together</li>
+                        </ul>
+                    </div>
+                    
+                </div>
             </div>
-            
-            <div class="reveal stopover"><div class="stopover-dot"></div><div class="stopover-text">3h 10m layover in Chicago 🌆</div></div>
-            
-            <div class="reveal leg-card">
-                <div class="leg-number">3</div>
-                <div class="route"><span class="city">Chicago</span><span class="plane-icon">✈️</span><span class="city">San Diego</span></div>
-                <div class="leg-details"><span>🕐 9:00 PM → 11:33 PM</span><span>⏱ 4h 33m</span></div>
-                <div class="leg-message">"The last leg... I can almost feel you already."</div>
-            </div>
         </div>
         
-        <div class="reveal destination">
-            <div class="heart">💕</div>
-            <h2>Landing in San Diego</h2>
-            <p style="color: #a0a0c0;">23 hours and 58 minutes of flying...<br>just to see your smile</p>
-        </div>
-        
-        <div class="reveal countdown">
-            <div class="countdown-label">Countdown to Takeoff</div>
-            <div class="countdown-boxes">
-                <div class="cd-box"><div class="cd-num" id="cd-days">--</div><div class="cd-label">days</div></div>
-                <div class="cd-box"><div class="cd-num" id="cd-hours">--</div><div class="cd-label">hours</div></div>
-                <div class="cd-box"><div class="cd-num" id="cd-mins">--</div><div class="cd-label">mins</div></div>
-                <div class="cd-box"><div class="cd-num" id="cd-secs">--</div><div class="cd-label">secs</div></div>
-            </div>
-        </div>
-        
-        <!-- DIVIDER -->
-        <div class="section-divider reveal"></div>
-        
-        <!-- ITINERARY -->
-        <div class="reveal itinerary-header">
-            <h2>Our Adventure Together</h2>
-            <p>14 days of us — every moment planned with love 💕</p>
-        </div>
-        
-        <!-- Day 1: April 10 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">10</div><div class="mon">APR</div></div>
-                <div class="day-label">First Night Together</div>
-                <div class="day-emoji">🍣</div>
-            </div>
-            <div class="day-tag">ARRIVAL DAY</div>
-            <ul class="event-list">
-                <li><span class="event-time">19:30</span><span class="event-icon">🍣</span> Reservation at Sushi Ota</li>
-            </ul>
-        </div>
-        
-        <!-- Day 2: April 11 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">11</div><div class="mon">APR</div></div>
-                <div class="day-label">Flowers & Strawberries</div>
-                <div class="day-emoji">🌸</div>
-            </div>
-            <ul class="event-list">
-                <li><span class="event-time">11:00</span><span class="event-icon">🛒</span> Civita Park — Farmers Market</li>
-                <li><span class="event-time">14:00</span><span class="event-icon">🌺</span> The Flower Fields (Carlsbad)</li>
-                <li><span class="event-time">16:00</span><span class="event-icon">🍓</span> Strawberry Picking — Carlsbad</li>
-            </ul>
-        </div>
-        
-        <!-- Day 3: April 12 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">12</div><div class="mon">APR</div></div>
-                <div class="day-label">Coastal Vibes</div>
-                <div class="day-emoji">🌊</div>
-            </div>
-            <ul class="event-list">
-                <li><span class="event-time">13:00</span><span class="event-icon">🍜</span> Wa Dining Okan</li>
-                <li><span class="event-time">18:00</span><span class="event-icon">🥾</span> Torrey Pines</li>
-                <li><span class="event-time">21:30</span><span class="event-icon">🍸</span> Raised by Wolves <span class="special-tag">SPEAKEASY</span></li>
-            </ul>
-        </div>
-        
-        <!-- Day 4: April 13 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">13</div><div class="mon">APR</div></div>
-                <div class="day-label">Coronado Island</div>
-                <div class="day-emoji">🏖️</div>
-            </div>
-            <div class="day-tag">ALL DAY ADVENTURE</div>
-            <ul class="event-list">
-                <li><span class="event-time">All day</span><span class="event-icon">🌴</span> Explore Coronado Island</li>
-                <li><span class="event-time">18:00</span><span class="event-icon">🍫</span> Ghirardelli Sundae</li>
-            </ul>
-        </div>
-        
-        <!-- Day 5: April 14 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">14</div><div class="mon">APR</div></div>
-                <div class="day-label">Universal Studios</div>
-                <div class="day-emoji">⚡</div>
-            </div>
-            <div class="day-tag">HARRY POTTER WORLD</div>
-            <ul class="event-list">
-                <li><span class="event-time">07:00</span><span class="event-icon">🧙</span> Universal — Harry Potter World</li>
-                <li><span class="event-time">11:00</span><span class="event-icon">🍜</span> Order Pho from Phở Gà Go</li>
-            </ul>
-        </div>
-        
-        <!-- Day 6: April 15 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">15</div><div class="mon">APR</div></div>
-                <div class="day-label">Cozy Sofabed Day</div>
-                <div class="day-emoji">🛋️</div>
-            </div>
-            <div class="day-tag">REST DAY</div>
-            <ul class="event-list">
-                <li><span class="event-time">All day</span><span class="event-icon">💤</span> Cuddles, movies, and doing absolutely nothing together</li>
-            </ul>
-        </div>
-        
-        <!-- Day 7: April 16 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">16</div><div class="mon">APR</div></div>
-                <div class="day-label">BBQ Day</div>
-                <div class="day-emoji">🔥</div>
-            </div>
-            <ul class="event-list">
-                <li><span class="event-time">All day</span><span class="event-icon">🥩</span> SOTBBQ</li>
-            </ul>
-        </div>
-        
-        <!-- Day 8: April 17 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">17</div><div class="mon">APR</div></div>
-                <div class="day-label">Balboa Park</div>
-                <div class="day-emoji">🌹</div>
-            </div>
-            <ul class="event-list">
-                <li><span class="event-time">Daytime</span><span class="event-icon">⛩️</span> Japanese Friendship Garden</li>
-                <li><span class="event-time">Daytime</span><span class="event-icon">🌹</span> Rose Garden</li>
-                <li><span class="event-time">18:30</span><span class="event-icon">🍜</span> Pho Duyen Mai</li>
-            </ul>
-        </div>
-        
-        <!-- Day 9: April 18 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">18</div><div class="mon">APR</div></div>
-                <div class="day-label">Little Italy & Pottery</div>
-                <div class="day-emoji">🎨</div>
-            </div>
-            <ul class="event-list">
-                <li><span class="event-time">11:00</span><span class="event-icon">🛒</span> Little Italy — Farmers Market</li>
-                <li><span class="event-time">13:30</span><span class="event-icon">🥞</span> Morning Glory Brunch</li>
-                <li><span class="event-time">16:00</span><span class="event-icon">🏺</span> Intro to Pottery <span class="special-tag">DATE NIGHT</span></li>
-                <li><span class="event-time">19:00</span><span class="event-icon">🍲</span> Tasty Pot</li>
-            </ul>
-        </div>
-        
-        <!-- Day 10: April 19 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">19</div><div class="mon">APR</div></div>
-                <div class="day-label">Valentine's Day</div>
-                <div class="day-emoji">💝</div>
-            </div>
-            <div class="day-tag">💕 OUR VALENTINE'S</div>
-            <ul class="event-list">
-                <li><span class="event-time">19:30</span><span class="event-icon">🍝</span> Reservation at Cesarina <span class="special-tag">ROMANTIC</span></li>
-            </ul>
-        </div>
-        
-        <!-- Day 11: April 20 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">20</div><div class="mon">APR</div></div>
-                <div class="day-label">Picnic in the Park</div>
-                <div class="day-emoji">🧁</div>
-            </div>
-            <ul class="event-list">
-                <li><span class="event-time">16:00</span><span class="event-icon">🥐</span> Paris Baguette</li>
-                <li><span class="event-time">18:00</span><span class="event-icon">🧺</span> Picnic with Cake — Kate Sessions Park</li>
-            </ul>
-        </div>
-        
-        <!-- Day 12: April 21 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">21</div><div class="mon">APR</div></div>
-                <div class="day-label">Cozy Sofabed Day #2</div>
-                <div class="day-emoji">🛋️</div>
-            </div>
-            <div class="day-tag">REST DAY</div>
-            <ul class="event-list">
-                <li><span class="event-time">All day</span><span class="event-icon">🥰</span> Round two of doing nothing but being together</li>
-            </ul>
-        </div>
-        
-        <!-- Day 13: April 22 -->
-        <div class="reveal day-card">
-            <div class="day-header">
-                <div class="day-date"><div class="num">22</div><div class="mon">APR</div></div>
-                <div class="day-label">Aquarium & Sunset</div>
-                <div class="day-emoji">🐠</div>
-            </div>
-            <ul class="event-list">
-                <li><span class="event-time">15:45</span><span class="event-icon">🐠</span> Birch Aquarium</li>
-                <li><span class="event-time">Sunset</span><span class="event-icon">🌅</span> Watch the sunset together</li>
-            </ul>
-        </div>
-        
-        <!-- end of itinerary -->
-        
-        <!-- FINAL MESSAGE -->
         <div class="section-divider reveal"></div>
         
         <div class="reveal final-message">
-            <p>
-                14 days of adventures, food comas,<br>
-                cozy days, sunset kisses, and you.<br><br>
-                I would fly 23 hours across the world<br>
-                just to hold you for one second.<br><br>
-                But I'm coming for way more than a second. 😏💕
-            </p>
+            <p>14 days of adventures, food comas,<br>cozy days, sunset kisses, and you.<br><br>I would fly 23 hours across the world<br>just to hold you for one second.<br><br>But I'm coming for way more than a second. 😏💕</p>
             <div class="signature">— Tobias ❤️</div>
         </div>
     </div>
@@ -407,44 +271,20 @@
     <script>
         // Stars
         const starsEl = document.getElementById('stars');
-        for (let i = 0; i < 100; i++) {
-            const s = document.createElement('div');
-            s.className = 'star';
-            s.style.left = Math.random()*100+'%';
-            s.style.top = Math.random()*100+'%';
-            s.style.setProperty('--dur', (2+Math.random()*3)+'s');
-            s.style.animationDelay = Math.random()*3+'s';
-            starsEl.appendChild(s);
-        }
+        for (let i = 0; i < 100; i++) { const s = document.createElement('div'); s.className='star'; s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*100+'%'; s.style.setProperty('--dur',(2+Math.random()*3)+'s'); s.style.animationDelay=Math.random()*3+'s'; starsEl.appendChild(s); }
         
-        // Floating hearts
+        // Hearts
         const heartsEl = document.getElementById('hearts');
         const emojis = ['💕','💗','💖','✨','💜'];
-        for (let i = 0; i < 12; i++) {
-            const h = document.createElement('div');
-            h.className = 'fheart'; h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-            h.style.left = Math.random()*100+'%';
-            h.style.setProperty('--dur', (8+Math.random()*8)+'s');
-            h.style.setProperty('--delay', (Math.random()*10)+'s');
-            h.style.fontSize = (14+Math.random()*16)+'px';
-            heartsEl.appendChild(h);
-        }
+        for (let i = 0; i < 12; i++) { const h = document.createElement('div'); h.className='fheart'; h.textContent=emojis[Math.floor(Math.random()*emojis.length)]; h.style.left=Math.random()*100+'%'; h.style.setProperty('--dur',(8+Math.random()*8)+'s'); h.style.setProperty('--delay',(Math.random()*10)+'s'); h.style.fontSize=(14+Math.random()*16)+'px'; heartsEl.appendChild(h); }
         
         // Scroll reveal
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
-        }, { threshold: 0.15 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        const obs = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
         
         // Countdown
         const target = new Date('2026-04-09T08:35:00+02:00').getTime();
-        function updateCD() {
-            const diff = Math.max(0, target - Date.now());
-            document.getElementById('cd-days').textContent = Math.floor(diff/86400000);
-            document.getElementById('cd-hours').textContent = Math.floor((diff%86400000)/3600000);
-            document.getElementById('cd-mins').textContent = Math.floor((diff%3600000)/60000);
-            document.getElementById('cd-secs').textContent = Math.floor((diff%60000)/1000);
-        }
+        function updateCD() { const d = Math.max(0, target-Date.now()); document.getElementById('cd-days').textContent=Math.floor(d/864e5); document.getElementById('cd-hours').textContent=Math.floor((d%864e5)/36e5); document.getElementById('cd-mins').textContent=Math.floor((d%36e5)/6e4); document.getElementById('cd-secs').textContent=Math.floor((d%6e4)/1e3); }
         updateCD(); setInterval(updateCD, 1000);
     </script>
 </body>
