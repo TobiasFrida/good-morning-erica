@@ -35,7 +35,8 @@
             width: 85px; height: 85px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 2px;
-            pointer-events: none;
+            pointer-events: auto;
+            cursor: pointer;
             border-radius: 50%;
             background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.25), rgba(150,210,255,0.1) 50%, rgba(100,180,240,0.08) 70%, transparent 100%);
             border: 1.5px solid rgba(150,210,255,0.3);
@@ -62,8 +63,12 @@
         .bubble .emoji { font-size: 22px; line-height: 1; position: relative; z-index: 1; }
         .bubble .text { font-size: 8px; color: #c0d8f0; font-weight: 400; text-align: center; line-height: 1.1; max-width: 60px; overflow: hidden; position: relative; z-index: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         
-        /* Content */
-        .content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 30px 20px; text-align: center; }
+        /* Heart explosion */
+        .heart-burst { position: fixed; pointer-events: none; z-index: 10; font-size: 18px; animation: burstOut 0.8s ease-out forwards; }
+        @keyframes burstOut { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--bx), var(--by)) scale(0.3); opacity: 0; } }
+        
+        /* Content — never behind water */
+        .content { position: relative; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 30px 20px 32vh; text-align: center; }
         
         .intro { margin-bottom: 20px; animation: fadeIn 1.5s ease; }
         .intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 48px); background: linear-gradient(135deg, #ff6b9d, #c850c0, #4158d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
@@ -284,6 +289,29 @@
         }
         
         animate();
+        
+        // Heart explosion on bubble click
+        const hearts = ['💖', '💗', '💕', '❤️', '💘', '💝', '💓', '💞'];
+        document.addEventListener('click', (e) => {
+            const bubble = e.target.closest('.bubble');
+            if (!bubble) return;
+            const rect = bubble.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            for (let i = 0; i < 12; i++) {
+                const h = document.createElement('div');
+                h.className = 'heart-burst';
+                h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                h.style.left = cx + 'px';
+                h.style.top = cy + 'px';
+                const angle = (Math.PI * 2 / 12) * i;
+                const dist = 60 + Math.random() * 60;
+                h.style.setProperty('--bx', Math.cos(angle) * dist + 'px');
+                h.style.setProperty('--by', Math.sin(angle) * dist + 'px');
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 800);
+            }
+        });
     </script>
 </body>
 </html>
