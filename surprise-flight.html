@@ -104,6 +104,24 @@
         .final-message p { font-size: 16px; line-height: 1.8; color: #d0d0e8; font-weight: 300; }
         .final-message .signature { margin-top: 14px; font-family: 'Playfair Display', serif; font-size: 22px; color: #ff6b9d; }
         
+        /* Falling stars and hearts */
+        .falling {
+            position: fixed; z-index: 1;
+            top: -30px;
+            color: #ff2d95;
+            pointer-events: none;
+            animation: fall var(--dur) linear infinite;
+            animation-delay: var(--delay);
+            opacity: 0.7;
+            font-size: var(--size);
+        }
+        @keyframes fall {
+            0% { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -162,6 +180,20 @@
         const target = new Date('2026-04-09T08:35:00+02:00').getTime();
         function updateCD() { const d=Math.max(0,target-Date.now()); document.getElementById('cd-days').textContent=Math.floor(d/864e5); document.getElementById('cd-hours').textContent=Math.floor((d%864e5)/36e5); document.getElementById('cd-mins').textContent=Math.floor((d%36e5)/6e4); document.getElementById('cd-secs').textContent=Math.floor((d%6e4)/1e3); }
         updateCD(); setInterval(updateCD, 1000);
+        
+        // Falling stars and hearts
+        const fallingEmojis = ['⭐', '💖', '✨', '💗', '⭐', '💕', '✨', '💖', '⭐', '💗'];
+        for (let i = 0; i < 40; i++) {
+            const el = document.createElement('div');
+            el.className = 'falling';
+            el.textContent = fallingEmojis[i % fallingEmojis.length];
+            el.style.left = Math.random() * 100 + '%';
+            el.style.setProperty('--dur', (6 + Math.random() * 8) + 's');
+            el.style.setProperty('--delay', (Math.random() * 10) + 's');
+            el.style.setProperty('--size', (12 + Math.random() * 14) + 'px');
+            el.style.opacity = 0.4 + Math.random() * 0.4;
+            document.body.appendChild(el);
+        }
         
         // Physics-based floating bubbles with collision avoidance
         const activities = [
