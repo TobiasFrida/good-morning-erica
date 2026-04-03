@@ -73,10 +73,10 @@
         .final-message p { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.9; color: #d0d0e8; font-weight: 400; font-style: italic; }
         .final-message .signature { margin-top: 12px; font-family: 'Playfair Display', serif; font-size: 20px; color: #ff6b9d; }
         
-        /* Falling bubbles */
+        /* Falling bubbles with activity text */
         .falling-bubble {
             position: fixed; z-index: 2;
-            top: -60px;
+            top: -80px;
             pointer-events: none;
             border-radius: 50%;
             background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.2), rgba(150,210,255,0.08) 50%, transparent 100%);
@@ -85,6 +85,12 @@
             animation-delay: var(--delay);
             width: var(--size);
             height: var(--size);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .falling-bubble span {
+            font-size: 8px; color: rgba(200,220,255,0.8); text-align: center;
+            font-weight: 400; line-height: 1.1; max-width: 80%; overflow: hidden;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
         .falling-bubble::before {
             content: '';
@@ -96,7 +102,7 @@
             transform: rotate(-20deg);
         }
         @keyframes fallBubble {
-            0% { transform: translateY(-60px) translateX(0); opacity: 0; }
+            0% { transform: translateY(-80px) translateX(0); opacity: 0; }
             10% { opacity: 0.7; }
             90% { opacity: 0.7; }
             100% { transform: translateY(105vh) translateX(var(--drift)); opacity: 0; }
@@ -197,14 +203,16 @@
         function updateCD() { const d=Math.max(0,target-Date.now()); document.getElementById('cd-days').textContent=Math.floor(d/864e5); document.getElementById('cd-hours').textContent=Math.floor((d%864e5)/36e5); document.getElementById('cd-mins').textContent=Math.floor((d%36e5)/6e4); document.getElementById('cd-secs').textContent=Math.floor((d%6e4)/1e3); }
         updateCD(); setInterval(updateCD, 1000);
         
-        // Falling bubbles
-        for (let i = 0; i < 25; i++) {
+        // Falling bubbles with activity text
+        const acts = ['Sushi','Market','Flowers','Berries','Ramen','Hike','Speakeasy','Beach','Chocolate','Hogwarts','Cozy Day','BBQ','Garden','Roses','Pottery','Brunch','Hot Pot','Valentine\'s','Picnic','Cozy Day','Aquarium','Sunset'];
+        for (let i = 0; i < acts.length; i++) {
             const el = document.createElement('div');
             el.className = 'falling-bubble';
-            el.style.left = Math.random() * 100 + '%';
-            const size = 15 + Math.random() * 35;
-            el.style.setProperty('--dur', (8 + Math.random() * 10) + 's');
-            el.style.setProperty('--delay', (Math.random() * 12) + 's');
+            el.innerHTML = `<span>${acts[i]}</span>`;
+            el.style.left = Math.random() * 95 + '%';
+            const size = 45 + Math.random() * 25;
+            el.style.setProperty('--dur', (10 + Math.random() * 12) + 's');
+            el.style.setProperty('--delay', (Math.random() * 14) + 's');
             el.style.setProperty('--size', size + 'px');
             el.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
             document.body.appendChild(el);
