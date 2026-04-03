@@ -27,7 +27,7 @@
         /* Bubbles */
         .bubble {
             position: fixed; z-index: 5;
-            width: 85px; height: 85px;
+            width: 28px; height: 28px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 2px;
             pointer-events: auto;
@@ -41,7 +41,7 @@
             content: '';
             position: absolute;
             top: 12%; right: 18%;
-            width: 18px; height: 12px;
+            width: 6px; height: 4px;
             background: rgba(255,255,255,0.4);
             border-radius: 50%;
             transform: rotate(-20deg);
@@ -50,13 +50,13 @@
             content: '';
             position: absolute;
             top: 20%; right: 22%;
-            width: 7px; height: 5px;
+            width: 3px; height: 2px;
             background: rgba(255,255,255,0.3);
             border-radius: 50%;
             transform: rotate(-20deg);
         }
-        .bubble .emoji { font-size: 22px; line-height: 1; position: relative; z-index: 1; }
-        .bubble .text { font-size: 8px; color: #c0d8f0; font-weight: 400; text-align: center; line-height: 1.1; max-width: 60px; overflow: hidden; position: relative; z-index: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .bubble .emoji { font-size: 10px; line-height: 1; position: relative; z-index: 1; }
+        .bubble .text { font-size: 5px; color: #c0d8f0; font-weight: 400; text-align: center; line-height: 1; max-width: 24px; overflow: hidden; position: relative; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         
         /* Heart explosion */
         .heart-burst { position: fixed; pointer-events: none; z-index: 10; font-size: 18px; animation: burstOut 0.8s ease-out forwards; }
@@ -76,7 +76,8 @@
         @keyframes sparkBurst { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; } }
         
         /* Content — never behind water */
-        .content { position: relative; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 30px 20px 32vh; text-align: center; }
+        .content { position: relative; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 30px 20px 35vh; text-align: center; }
+        @media (max-width: 768px) { .content { padding-bottom: 45vh; min-height: auto; } }
         
         .intro { margin-bottom: 20px; animation: fadeIn 1.5s ease; }
         .intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 48px); background: linear-gradient(135deg, #ff6b9d, #c850c0, #4158d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
@@ -215,7 +216,7 @@
         const bubbles = [];
         const W = () => window.innerWidth;
         const H = () => window.innerHeight;
-        const SIZE = 85;
+        const SIZE = 28;
         const R = SIZE / 2;
         
         // Curved ocean boundary — matches the SVG bowl
@@ -223,10 +224,11 @@
             const w = W();
             const h = H();
             const nx = x / w;
-            // Bowl: edges at 45%, center at 72%
-            const centerDip = 0.72;
-            const edgeHeight = 0.45;
-            const t = (nx - 0.5) * 2; // -1 to 1
+            // Mobile: push water lower; Desktop: normal bowl
+            const isMobile = w < 768;
+            const centerDip = isMobile ? 0.85 : 0.72;
+            const edgeHeight = isMobile ? 0.55 : 0.45;
+            const t = (nx - 0.5) * 2;
             const curve = edgeHeight + (centerDip - edgeHeight) * (1 - t * t);
             return h * curve;
         }
