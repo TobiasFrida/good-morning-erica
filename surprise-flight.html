@@ -10,215 +10,155 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a1a; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; min-height: 100vh; }
         
-        /* Photo collage BG */
+        /* Photo BG */
         .bg-collage { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 3px; }
         .bg-collage img { width: 100%; height: 100%; object-fit: cover; }
-        .bg-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,10,26,0.78); z-index: 1; backdrop-filter: blur(3px); }
+        .bg-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,10,26,0.8); z-index: 1; backdrop-filter: blur(3px); }
         
-        .container { position: relative; z-index: 2; padding: 30px 20px; text-align: center; }
+        /* Floating emoji bubbles - FULLSCREEN */
+        .bubble {
+            position: fixed; z-index: 2;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 50px;
+            padding: 8px 16px;
+            display: flex; align-items: center; gap: 8px;
+            white-space: nowrap;
+            animation: floatBubble var(--dur) ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        .bubble .emoji { font-size: 18px; }
+        .bubble .text { font-size: 12px; color: #d0d0e8; font-weight: 400; }
         
-        /* Intro */
+        @keyframes floatBubble {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(var(--dx1), var(--dy1)); }
+            50% { transform: translate(var(--dx2), var(--dy2)); }
+            75% { transform: translate(var(--dx3), var(--dy3)); }
+            100% { transform: translate(var(--dx4), var(--dy4)); }
+        }
+        
+        /* Content */
+        .content { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px 20px; text-align: center; }
+        
         .intro { margin-bottom: 20px; animation: fadeIn 1.5s ease; }
-        .intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(26px, 5vw, 44px); background: linear-gradient(135deg, #ff6b9d, #c850c0, #4158d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .intro h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 6vw, 48px); background: linear-gradient(135deg, #ff6b9d, #c850c0, #4158d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
         .intro p { font-size: 15px; color: #a0a0c0; font-weight: 300; }
         .date-badge { display: inline-block; background: rgba(200,80,192,0.15); border: 1px solid rgba(200,80,192,0.3); padding: 6px 20px; border-radius: 50px; font-size: 13px; color: #c850c0; margin-top: 14px; letter-spacing: 2px; }
         
-        /* Globe/Map */
-        .map-container { position: relative; width: 100%; max-width: 900px; margin: 30px auto; }
-        .map-svg { width: 100%; height: auto; }
+        /* Globe */
+        .globe-wrap { position: relative; margin: 20px auto; width: clamp(280px, 50vw, 420px); }
+        .globe-img { width: 100%; height: auto; filter: drop-shadow(0 0 40px rgba(65,88,208,0.3)) drop-shadow(0 0 80px rgba(200,80,192,0.15)); }
         
-        /* City dots */
-        .city-dot { animation: pulse 2s ease-in-out infinite; }
-        @keyframes pulse { 0%, 100% { r: 5; opacity: 1; } 50% { r: 8; opacity: 0.7; } }
-        .city-dot.destination { animation: pulseBig 1.5s ease-in-out infinite; }
-        @keyframes pulseBig { 0%, 100% { r: 7; opacity: 1; } 50% { r: 12; opacity: 0.8; } }
+        /* City pins on globe */
+        .pin { position: absolute; text-align: center; transform: translate(-50%, -100%); }
+        .pin-dot { width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 3px; }
+        .pin-dot.start { background: #4158d0; box-shadow: 0 0 12px #4158d0; }
+        .pin-dot.mid { background: #c850c0; box-shadow: 0 0 12px #c850c0; }
+        .pin-dot.dest { background: #ff6b9d; box-shadow: 0 0 16px #ff6b9d; width: 12px; height: 12px; animation: pulseDot 1.5s ease-in-out infinite; }
+        .pin-dot.hawaii { background: #ff6b9d; box-shadow: 0 0 10px #ff6b9d; width: 8px; height: 8px; }
+        @keyframes pulseDot { 0%,100% { transform: scale(1); } 50% { transform: scale(1.4); } }
+        .pin-ring { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; border: 1.5px solid #ff6b9d; border-radius: 50%; transform: translate(-50%, -50%); animation: ringPulse 2s ease-in-out infinite; }
+        @keyframes ringPulse { 0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.4; } 50% { transform: translate(-50%,-50%) scale(1.8); opacity: 0; } }
+        .pin-label { font-size: 10px; font-weight: 600; color: #e0e0f0; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+        .pin-sub { font-size: 8px; color: #a0a0c0; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+        .pin-special { font-size: 8px; color: #ff6b9d; font-family: 'Playfair Display', serif; font-style: italic; white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
         
-        /* Flight path animation */
-        .flight-path-line { stroke-dasharray: 8 6; animation: dash 30s linear infinite; }
-        @keyframes dash { to { stroke-dashoffset: -1000; } }
+        /* Flight arcs (SVG overlay) */
+        .flight-arcs { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .arc { fill: none; stroke-width: 1.5; stroke-dasharray: 6 4; animation: dashFlow 20s linear infinite; }
+        @keyframes dashFlow { to { stroke-dashoffset: -200; } }
         
-        /* City labels */
-        .city-label { font-family: 'Inter', sans-serif; font-size: 11px; fill: #e0e0f0; font-weight: 600; }
-        .city-sublabel { font-family: 'Inter', sans-serif; font-size: 8px; fill: #a0a0c0; }
-        .hawaii-label { font-family: 'Playfair Display', serif; font-size: 9px; fill: #ff6b9d; }
-        
-        /* Plane icon along path */
-        .plane { font-size: 18px; }
-        
-        /* Timeline below map */
-        .timeline { display: flex; justify-content: center; align-items: center; gap: 0; margin: 20px auto; max-width: 700px; flex-wrap: wrap; }
-        .tl-stop { text-align: center; flex: 0 0 auto; padding: 8px 12px; }
-        .tl-city { font-size: 12px; font-weight: 600; color: #e0e0f0; }
-        .tl-time { font-size: 10px; color: #808098; margin-top: 2px; }
-        .tl-dot { width: 10px; height: 10px; border-radius: 50%; margin: 0 auto 6px; }
-        .tl-dot.start { background: #4158d0; box-shadow: 0 0 10px #4158d0; }
-        .tl-dot.mid { background: #c850c0; box-shadow: 0 0 10px #c850c0; }
-        .tl-dot.end { background: #ff6b9d; box-shadow: 0 0 15px #ff6b9d; }
-        .tl-arrow { color: #c850c0; font-size: 18px; padding: 0 4px; margin-top: -10px; }
-        .tl-duration { font-size: 9px; color: #808098; padding: 0 2px; }
+        /* Timeline */
+        .timeline { display: flex; align-items: center; justify-content: center; gap: 0; margin: 20px auto; flex-wrap: wrap; }
+        .tl-stop { text-align: center; padding: 6px 10px; }
+        .tl-city { font-size: 11px; font-weight: 600; color: #e0e0f0; }
+        .tl-time { font-size: 9px; color: #808098; margin-top: 2px; }
+        .tl-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto 4px; }
+        .tl-dot.s { background: #4158d0; } .tl-dot.m { background: #c850c0; } .tl-dot.e { background: #ff6b9d; box-shadow: 0 0 10px #ff6b9d; }
+        .tl-sep { color: #c850c0; font-size: 10px; padding: 0 2px; }
         
         /* Countdown */
-        .countdown { margin: 25px auto; }
+        .countdown { margin: 20px auto; }
         .countdown-label { font-size: 11px; color: #808098; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
         .countdown-boxes { display: flex; justify-content: center; gap: 10px; }
         .cd-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(200,80,192,0.2); border-radius: 10px; padding: 12px 16px; min-width: 58px; }
         .cd-num { font-family: 'Playfair Display', serif; font-size: 24px; color: #c850c0; }
         .cd-label { font-size: 10px; color: #808098; margin-top: 2px; }
         
-        /* Floating emoji bubbles */
-        .bubble-zone { position: relative; width: 100%; min-height: 400px; margin: 30px auto; max-width: 1000px; overflow: hidden; }
-        .bubble {
-            position: absolute;
-            background: rgba(255,255,255,0.06);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            padding: 12px 18px;
-            display: flex; align-items: center; gap: 10px;
-            white-space: nowrap;
-            animation: floatBubble var(--dur) var(--delay) ease-in-out infinite alternate;
-            opacity: 0;
-            animation-fill-mode: forwards;
-        }
-        .bubble .emoji { font-size: 22px; }
-        .bubble .text { font-size: 13px; color: #d0d0e8; font-weight: 300; }
-        .bubble .day { font-size: 10px; color: #c850c0; font-weight: 600; }
-        
-        @keyframes floatBubble {
-            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.85; }
-            25% { transform: translate(var(--dx1), var(--dy1)) rotate(1deg); opacity: 0.9; }
-            50% { transform: translate(var(--dx2), var(--dy2)) rotate(-0.5deg); opacity: 0.85; }
-            75% { transform: translate(var(--dx3), var(--dy3)) rotate(0.5deg); opacity: 0.9; }
-            100% { transform: translate(var(--dx4), var(--dy4)) rotate(-1deg); opacity: 0.85; }
-        }
-        
         /* Final */
-        .final-message { margin-top: 30px; padding: 20px; }
-        .final-message p { font-size: 17px; line-height: 1.8; color: #d0d0e8; font-weight: 300; }
-        .final-message .signature { margin-top: 16px; font-family: 'Playfair Display', serif; font-size: 22px; color: #ff6b9d; }
+        .final-message { margin-top: 20px; padding: 20px; }
+        .final-message p { font-size: 16px; line-height: 1.8; color: #d0d0e8; font-weight: 300; }
+        .final-message .signature { margin-top: 14px; font-family: 'Playfair Display', serif; font-size: 22px; color: #ff6b9d; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <div class="bg-collage">
-        <img src="photo1.jpg" alt=""><img src="photo4.jpg" alt=""><img src="photo5.jpg" alt=""><img src="photo2.jpg" alt="">
-        <img src="photo6.jpg" alt=""><img src="photo3.jpg" alt=""><img src="photo8.jpg" alt=""><img src="photo7.jpg" alt="">
+        <img src="photo1.jpg"><img src="photo4.jpg"><img src="photo5.jpg"><img src="photo2.jpg">
+        <img src="photo6.jpg"><img src="photo3.jpg"><img src="photo8.jpg"><img src="photo7.jpg">
     </div>
     <div class="bg-overlay"></div>
     
-    <div class="container">
+    <!-- Floating bubbles injected by JS -->
+    
+    <div class="content">
         <div class="intro">
             <h1>I'm On My Way To You</h1>
             <p>Every mile is one step closer to your arms</p>
             <div class="date-badge">APRIL 9 – 22, 2026</div>
         </div>
         
-        <!-- MAP CENTERPIECE -->
-        <div class="map-container">
-            <svg class="map-svg" viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg">
-                <!-- Ocean background -->
-                <rect width="800" height="420" fill="#0d1129" rx="16"/>
-                
-                <!-- Simplified continents -->
-                <!-- North America -->
-                <path d="M80,80 L150,60 L200,70 L240,90 L260,80 L280,90 L290,110 L300,130 L280,160 L260,180 L240,200 L220,220 L200,230 L180,220 L160,240 L140,260 L120,250 L100,220 L90,200 L80,170 L70,140 L75,110 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- Central America -->
-                <path d="M160,240 L170,260 L175,280 L180,290 L185,285 L190,275 L185,260 L175,250 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- South America -->
-                <path d="M190,290 L210,300 L230,320 L240,350 L230,380 L210,400 L190,390 L180,370 L175,340 L180,310 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- Europe -->
-                <path d="M380,70 L400,65 L420,70 L440,75 L460,70 L470,80 L465,95 L450,100 L440,110 L430,120 L420,115 L410,120 L400,115 L390,110 L385,100 L380,90 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- Scandinavia -->
-                <path d="M400,40 L410,35 L420,40 L425,55 L420,65 L410,70 L400,65 L395,55 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- UK -->
-                <path d="M370,75 L378,70 L382,78 L376,85 L370,80 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- Africa -->
-                <path d="M400,130 L430,125 L460,140 L470,170 L465,200 L450,230 L430,250 L410,240 L400,220 L395,190 L390,160 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- Asia -->
-                <path d="M470,50 L520,40 L570,45 L620,50 L670,60 L700,80 L710,110 L700,140 L680,150 L650,140 L620,130 L580,120 L550,110 L520,100 L500,90 L480,80 L470,70 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- Australia -->
-                <path d="M620,280 L660,270 L690,280 L700,300 L690,320 L660,330 L630,320 L620,300 Z" fill="#1a2040" stroke="#2a3060" stroke-width="0.5"/>
-                <!-- Hawaii islands -->
-                <circle cx="120" cy="185" r="3" fill="#1a2040" stroke="#ff6b9d" stroke-width="1"/>
-                <circle cx="125" cy="187" r="2" fill="#1a2040" stroke="#ff6b9d" stroke-width="0.8"/>
-                
-                <!-- Grid lines -->
-                <line x1="0" y1="210" x2="800" y2="210" stroke="#1a2550" stroke-width="0.3" stroke-dasharray="4 4"/>
-                <line x1="400" y1="0" x2="400" y2="420" stroke="#1a2550" stroke-width="0.3" stroke-dasharray="4 4"/>
-                
-                <!-- FLIGHT PATH: Umeå → Helsinki -->
-                <path d="M415,48 Q430,40 448,52" fill="none" stroke="#4158d0" stroke-width="2" class="flight-path-line" opacity="0.8"/>
-                
-                <!-- FLIGHT PATH: Helsinki → Chicago (great circle arc) -->
-                <path d="M448,52 Q350,-20 220,140" fill="none" stroke="#7b68d0" stroke-width="2" class="flight-path-line" opacity="0.8"/>
-                
-                <!-- FLIGHT PATH: Chicago → San Diego -->
-                <path d="M220,140 Q180,170 150,175" fill="none" stroke="#c850c0" stroke-width="2" class="flight-path-line" opacity="0.8"/>
-                
-                <!-- HAWAII HEART LINE (where we first met) -->
-                <path d="M150,175 Q135,180 122,185" fill="none" stroke="#ff6b9d" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
-                
-                <!-- City dots -->
-                <!-- Umeå -->
-                <circle cx="415" cy="48" r="5" fill="#4158d0" class="city-dot"/>
-                <text x="415" y="38" text-anchor="middle" class="city-label">Umeå</text>
-                <text x="415" y="64" text-anchor="middle" class="city-sublabel">8:35 AM</text>
-                
-                <!-- Helsinki -->
-                <circle cx="448" cy="52" r="5" fill="#5a58d0" class="city-dot"/>
-                <text x="462" y="48" class="city-label">Helsinki</text>
-                <text x="462" y="58" class="city-sublabel">10:50 AM → 4:25 PM</text>
-                
-                <!-- Chicago -->
-                <circle cx="220" cy="140" r="5" fill="#9050c0" class="city-dot"/>
-                <text x="220" y="130" text-anchor="middle" class="city-label">Chicago</text>
-                <text x="220" y="156" text-anchor="middle" class="city-sublabel">5:50 PM → 9:00 PM</text>
-                
-                <!-- San Diego (DESTINATION) -->
-                <circle cx="150" cy="175" r="7" fill="#ff6b9d" class="city-dot destination"/>
-                <circle cx="150" cy="175" r="14" fill="none" stroke="#ff6b9d" stroke-width="1" opacity="0.3">
-                    <animate attributeName="r" values="14;22;14" dur="2s" repeatCount="indefinite"/>
-                    <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
-                </circle>
-                <text x="150" y="165" text-anchor="middle" class="city-label" fill="#ff6b9d" style="font-size:13px;">San Diego</text>
-                <text x="150" y="196" text-anchor="middle" class="city-sublabel">11:33 PM 💕</text>
-                
-                <!-- Hawaii -->
-                <circle cx="122" cy="185" r="4" fill="#ff6b9d" opacity="0.6"/>
-                <text x="105" y="205" text-anchor="middle" class="hawaii-label">Hawaii 🌺</text>
-                <text x="105" y="215" text-anchor="middle" style="font-size:7px; fill:#ff6b9d; font-family:'Playfair Display',serif;">Where we first met</text>
-                
-                <!-- Plane icons on paths -->
-                <text class="plane" x="0" y="0">✈️</text>
-                <animateMotion dur="8s" repeatCount="indefinite" path="M415,48 Q430,40 448,52 Q350,-20 220,140 Q180,170 150,175">
-                </animateMotion>
-                
-                <!-- Travel time labels -->
-                <text x="432" y="42" style="font-size:7px; fill:#4158d0;">1h 15m</text>
-                <text x="330" y="60" style="font-size:7px; fill:#7b68d0;">9h 25m</text>
-                <text x="178" y="165" style="font-size:7px; fill:#c850c0;">4h 33m</text>
-                
-                <!-- Total time -->
-                <text x="400" y="400" text-anchor="middle" style="font-size:10px; fill:#808098; font-family:'Inter',sans-serif;">Total journey: 23h 58m across the world</text>
+        <!-- GLOBE -->
+        <div class="globe-wrap">
+            <img src="globe.png" class="globe-img" alt="">
+            
+            <!-- Flight arcs SVG -->
+            <svg class="flight-arcs" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <!-- Umeå → Helsinki -->
+                <path d="M54,22 Q56,19 58,22" class="arc" stroke="#4158d0"/>
+                <!-- Helsinki → Chicago -->
+                <path d="M58,22 Q42,5 30,42" class="arc" stroke="#7b68d0"/>
+                <!-- Chicago → San Diego -->
+                <path d="M30,42 Q24,48 20,50" class="arc" stroke="#c850c0"/>
             </svg>
+            
+            <!-- Pins -->
+            <div class="pin" style="left:54%; top:24%;">
+                <div class="pin-dot start"></div>
+                <div class="pin-label">Umeå</div>
+            </div>
+            <div class="pin" style="left:59%; top:24%;">
+                <div class="pin-dot mid"></div>
+                <div class="pin-label">Helsinki</div>
+            </div>
+            <div class="pin" style="left:30%; top:44%;">
+                <div class="pin-dot mid"></div>
+                <div class="pin-label">Chicago</div>
+            </div>
+            <div class="pin" style="left:20%; top:52%;">
+                <div class="pin-dot dest"><div class="pin-ring"></div></div>
+                <div class="pin-label" style="color:#ff6b9d;">San Diego</div>
+                <div class="pin-sub">💕 11:33 PM</div>
+            </div>
+            <div class="pin" style="left:14%; top:56%;">
+                <div class="pin-dot hawaii"></div>
+                <div class="pin-special">Hawaii 🌺</div>
+                <div class="pin-special">Where we first met</div>
+            </div>
         </div>
         
         <!-- Timeline -->
         <div class="timeline">
-            <div class="tl-stop"><div class="tl-dot start"></div><div class="tl-city">Umeå 🇸🇪</div><div class="tl-time">8:35 AM</div></div>
-            <div class="tl-arrow">→</div>
-            <div class="tl-duration">1h 15m</div>
-            <div class="tl-arrow">→</div>
-            <div class="tl-stop"><div class="tl-dot mid"></div><div class="tl-city">Helsinki 🇫🇮</div><div class="tl-time">10:50 AM</div></div>
-            <div class="tl-arrow">→</div>
-            <div class="tl-duration">9h 25m</div>
-            <div class="tl-arrow">→</div>
-            <div class="tl-stop"><div class="tl-dot mid"></div><div class="tl-city">Chicago 🇺🇸</div><div class="tl-time">5:50 PM</div></div>
-            <div class="tl-arrow">→</div>
-            <div class="tl-duration">4h 33m</div>
-            <div class="tl-arrow">→</div>
-            <div class="tl-stop"><div class="tl-dot end"></div><div class="tl-city">San Diego 💕</div><div class="tl-time">11:33 PM</div></div>
+            <div class="tl-stop"><div class="tl-dot s"></div><div class="tl-city">Umeå 🇸🇪</div><div class="tl-time">8:35 AM</div></div>
+            <div class="tl-sep">→ 1h15m →</div>
+            <div class="tl-stop"><div class="tl-dot m"></div><div class="tl-city">Helsinki 🇫🇮</div><div class="tl-time">10:50 AM</div></div>
+            <div class="tl-sep">→ 9h25m →</div>
+            <div class="tl-stop"><div class="tl-dot m"></div><div class="tl-city">Chicago 🇺🇸</div><div class="tl-time">5:50 PM</div></div>
+            <div class="tl-sep">→ 4h33m →</div>
+            <div class="tl-stop"><div class="tl-dot e"></div><div class="tl-city">San Diego 💕</div><div class="tl-time">11:33 PM</div></div>
         </div>
         
         <!-- Countdown -->
@@ -232,11 +172,8 @@
             </div>
         </div>
         
-        <!-- FLOATING EMOJI BUBBLES (itinerary) -->
-        <div class="bubble-zone" id="bubbleZone"></div>
-        
-        <!-- Final message -->
-        <div class="final-message" style="animation: fadeIn 2s ease 3s both;">
+        <!-- Final -->
+        <div class="final-message">
             <p>14 days of adventures, food comas,<br>cozy days, sunset kisses, and you.<br><br>I would fly 23 hours across the world<br>just to hold you for one second.<br><br>But I'm coming for way more than a second. 😏💕</p>
             <div class="signature">— Tobias ❤️</div>
         </div>
@@ -248,61 +185,35 @@
         function updateCD() { const d=Math.max(0,target-Date.now()); document.getElementById('cd-days').textContent=Math.floor(d/864e5); document.getElementById('cd-hours').textContent=Math.floor((d%864e5)/36e5); document.getElementById('cd-mins').textContent=Math.floor((d%36e5)/6e4); document.getElementById('cd-secs').textContent=Math.floor((d%6e4)/1e3); }
         updateCD(); setInterval(updateCD, 1000);
         
-        // Floating emoji bubbles - itinerary
+        // Floating cute bubbles across entire screen
         const activities = [
-            { emoji: "🍣", text: "Sushi Ota", day: "APR 10" },
-            { emoji: "🛒", text: "Farmers Market", day: "APR 11" },
-            { emoji: "🌺", text: "Flower Fields", day: "APR 11" },
-            { emoji: "🍓", text: "Strawberry Picking", day: "APR 11" },
-            { emoji: "🍜", text: "Wa Dining Okan", day: "APR 12" },
-            { emoji: "🥾", text: "Torrey Pines", day: "APR 12" },
-            { emoji: "🍸", text: "Raised by Wolves", day: "APR 12" },
-            { emoji: "🏖️", text: "Coronado Island", day: "APR 13" },
-            { emoji: "🍫", text: "Ghirardelli Sundae", day: "APR 13" },
-            { emoji: "🧙", text: "Harry Potter World", day: "APR 14" },
-            { emoji: "🛋️", text: "Cozy Sofabed Day", day: "APR 15" },
-            { emoji: "🥩", text: "BBQ Day", day: "APR 16" },
-            { emoji: "⛩️", text: "Japanese Garden", day: "APR 17" },
-            { emoji: "🌹", text: "Rose Garden", day: "APR 17" },
-            { emoji: "🏺", text: "Pottery Class", day: "APR 18" },
-            { emoji: "🥞", text: "Morning Glory Brunch", day: "APR 18" },
-            { emoji: "🍲", text: "Tasty Pot", day: "APR 18" },
-            { emoji: "💝", text: "Valentine's Dinner", day: "APR 19" },
-            { emoji: "🧺", text: "Picnic in the Park", day: "APR 20" },
-            { emoji: "🛋️", text: "Sofabed Day #2", day: "APR 21" },
-            { emoji: "🐠", text: "Birch Aquarium", day: "APR 22" },
-            { emoji: "🌅", text: "Sunset Together", day: "APR 22" },
+            "🍣 Sushi Ota", "🛒 Farmers Market", "🌺 Flower Fields", "🍓 Strawberries",
+            "🍜 Wa Dining Okan", "🥾 Torrey Pines", "🍸 Raised by Wolves", "🏖️ Coronado",
+            "🍫 Ghirardelli", "🧙 Harry Potter", "🛋️ Cozy Day", "🥩 BBQ Day",
+            "⛩️ Japanese Garden", "🌹 Rose Garden", "🏺 Pottery Class", "🥞 Brunch",
+            "🍲 Tasty Pot", "💝 Valentine's", "🧺 Picnic", "🛋️ Cozy Day #2",
+            "🐠 Aquarium", "🌅 Sunset"
         ];
         
-        const zone = document.getElementById('bubbleZone');
-        const zoneW = 900, zoneH = 400;
-        const cols = 4, rows = Math.ceil(activities.length / cols);
-        
-        activities.forEach((a, i) => {
+        activities.forEach((text, i) => {
             const b = document.createElement('div');
             b.className = 'bubble';
-            b.innerHTML = `<span class="emoji">${a.emoji}</span><span><span class="day">${a.day}</span><br><span class="text">${a.text}</span></span>`;
+            const [emoji, ...rest] = text.split(' ');
+            b.innerHTML = `<span class="emoji">${emoji}</span><span class="text">${rest.join(' ')}</span>`;
             
-            // Grid-based initial position with randomness
-            const col = i % cols, row = Math.floor(i / cols);
-            const baseX = (col / cols) * 85 + 2;
-            const baseY = (row / rows) * 85 + 2;
-            const rx = (Math.random() - 0.5) * 5;
-            const ry = (Math.random() - 0.5) * 5;
+            // Random position across full viewport
+            b.style.left = (5 + Math.random() * 85) + '%';
+            b.style.top = (5 + Math.random() * 85) + '%';
+            b.style.setProperty('--dur', (14 + Math.random() * 10) + 's');
+            b.style.animationDelay = (i * 0.3) + 's';
             
-            b.style.left = (baseX + rx) + '%';
-            b.style.top = (baseY + ry) + '%';
-            b.style.setProperty('--dur', (12 + Math.random() * 8) + 's');
-            b.style.setProperty('--delay', (i * 0.15) + 's');
-            
-            // Random gentle float directions
-            const r = () => (Math.random() * 30 - 15) + 'px';
+            const r = () => (Math.random() * 40 - 20) + 'px';
             b.style.setProperty('--dx1', r()); b.style.setProperty('--dy1', r());
             b.style.setProperty('--dx2', r()); b.style.setProperty('--dy2', r());
             b.style.setProperty('--dx3', r()); b.style.setProperty('--dy3', r());
             b.style.setProperty('--dx4', r()); b.style.setProperty('--dy4', r());
             
-            zone.appendChild(b);
+            document.body.appendChild(b);
         });
     </script>
 </body>
