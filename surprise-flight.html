@@ -24,39 +24,7 @@
         .ray { position: absolute; top: -10px; width: 40px; height: 120%; background: linear-gradient(180deg, rgba(100,200,255,0.5), transparent 70%); transform: rotate(5deg); filter: blur(10px); animation: rayShimmer 4s ease-in-out infinite alternate; }
         @keyframes rayShimmer { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
         
-        /* Bubbles */
-        .bubble {
-            position: fixed; z-index: 5;
-            width: 56px; height: 56px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 2px;
-            pointer-events: auto;
-            cursor: pointer;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.25), rgba(150,210,255,0.1) 50%, rgba(100,180,240,0.08) 70%, transparent 100%);
-            border: 1.5px solid rgba(150,210,255,0.3);
-            box-shadow: inset 0 -8px 16px rgba(100,180,240,0.1), inset 4px 4px 10px rgba(255,255,255,0.15), 0 0 20px rgba(100,180,240,0.08);
-        }
-        .bubble::before {
-            content: '';
-            position: absolute;
-            top: 12%; right: 18%;
-            width: 12px; height: 8px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 50%;
-            transform: rotate(-20deg);
-        }
-        .bubble::after {
-            content: '';
-            position: absolute;
-            top: 20%; right: 22%;
-            width: 5px; height: 3px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            transform: rotate(-20deg);
-        }
-        .bubble .emoji { font-size: 16px; line-height: 1; position: relative; z-index: 1; }
-        .bubble .text { font-size: 7px; color: #c0d8f0; font-weight: 400; text-align: center; line-height: 1; max-width: 44px; overflow: hidden; position: relative; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        /* (old bubble CSS removed) */
         
         /* Heart explosion */
         .heart-burst { position: fixed; pointer-events: none; z-index: 10; font-size: 18px; animation: burstOut 0.8s ease-out forwards; }
@@ -105,21 +73,33 @@
         .final-message p { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.9; color: #d0d0e8; font-weight: 400; font-style: italic; }
         .final-message .signature { margin-top: 12px; font-family: 'Playfair Display', serif; font-size: 20px; color: #ff6b9d; }
         
-        /* Falling stars and hearts */
-        .falling {
+        /* Falling bubbles */
+        .falling-bubble {
             position: fixed; z-index: 2;
-            top: -30px;
-            color: #ff2d95;
+            top: -60px;
             pointer-events: none;
-            animation: fall var(--dur) linear infinite;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.2), rgba(150,210,255,0.08) 50%, transparent 100%);
+            border: 1px solid rgba(150,210,255,0.25);
+            animation: fallBubble var(--dur) linear infinite;
             animation-delay: var(--delay);
-            font-size: var(--size);
+            width: var(--size);
+            height: var(--size);
         }
-        @keyframes fall {
-            0% { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+        .falling-bubble::before {
+            content: '';
+            position: absolute;
+            top: 15%; right: 20%;
+            width: 30%; height: 20%;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: rotate(-20deg);
+        }
+        @keyframes fallBubble {
+            0% { transform: translateY(-60px) translateX(0); opacity: 0; }
             10% { opacity: 0.7; }
             90% { opacity: 0.7; }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+            100% { transform: translateY(105vh) translateX(var(--drift)); opacity: 0; }
         }
         
         /* Kiss button */
@@ -217,134 +197,21 @@
         function updateCD() { const d=Math.max(0,target-Date.now()); document.getElementById('cd-days').textContent=Math.floor(d/864e5); document.getElementById('cd-hours').textContent=Math.floor((d%864e5)/36e5); document.getElementById('cd-mins').textContent=Math.floor((d%36e5)/6e4); document.getElementById('cd-secs').textContent=Math.floor((d%6e4)/1e3); }
         updateCD(); setInterval(updateCD, 1000);
         
-        // Falling stars and hearts
-        const fallingEmojis = ['⭐', '💖', '✨', '💗', '⭐', '💕', '✨', '💖', '⭐', '💗'];
-        for (let i = 0; i < 20; i++) {
+        // Falling bubbles
+        for (let i = 0; i < 25; i++) {
             const el = document.createElement('div');
-            el.className = 'falling';
-            el.textContent = fallingEmojis[i % fallingEmojis.length];
+            el.className = 'falling-bubble';
             el.style.left = Math.random() * 100 + '%';
-            el.style.setProperty('--dur', (6 + Math.random() * 8) + 's');
-            el.style.setProperty('--delay', (Math.random() * 10) + 's');
-            el.style.setProperty('--size', (12 + Math.random() * 14) + 'px');
-            el.style.opacity = 0.4 + Math.random() * 0.4;
+            const size = 15 + Math.random() * 35;
+            el.style.setProperty('--dur', (8 + Math.random() * 10) + 's');
+            el.style.setProperty('--delay', (Math.random() * 12) + 's');
+            el.style.setProperty('--size', size + 'px');
+            el.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
             document.body.appendChild(el);
         }
         
-        // Physics bubbles — swim UNDER ocean surface, bounce off each other
-        const activities = [
-            ["🍣", "Sushi"], ["🛒", "Market"], ["🌺", "Flowers"], ["🍓", "Berries"],
-            ["🍜", "Ramen"], ["🥾", "Hike"], ["🍸", "Speakeasy"], ["🏖️", "Beach"],
-            ["🍫", "Chocolate"], ["🧙", "Hogwarts"], ["🛋️", "Cozy Day"], ["🥩", "BBQ"],
-            ["⛩️", "Garden"], ["🌹", "Roses"], ["🏺", "Pottery"], ["🥞", "Brunch"],
-            ["🍲", "Hot Pot"], ["💝", "Valentine's"], ["🧺", "Picnic"], ["🛋️", "Cozy #2"],
-            ["🐠", "Aquarium"], ["🌅", "Sunset"]
-        ];
-        
-        const bubbles = [];
         const W = () => window.innerWidth;
         const H = () => window.innerHeight;
-        const SIZE = 56;
-        const R = SIZE / 2;
-        
-        // Curved ocean boundary — matches the SVG bowl
-        function waterSurfaceY(x) {
-            const w = W();
-            const h = H();
-            const nx = x / w;
-            // Mobile: push water lower; Desktop: normal bowl
-            const isMobile = w < 768;
-            const centerDip = isMobile ? 0.85 : 0.72;
-            const edgeHeight = isMobile ? 0.55 : 0.45;
-            const t = (nx - 0.5) * 2;
-            const curve = edgeHeight + (centerDip - edgeHeight) * (1 - t * t);
-            return h * curve;
-        }
-        
-        activities.forEach((a, i) => {
-            const el = document.createElement('div');
-            el.className = 'bubble';
-            el.innerHTML = `<span class="emoji">${a[0]}</span><span class="text">${a[1]}</span>`;
-            document.body.appendChild(el);
-            
-            const speed = 0.5 + Math.random() * 0.8;
-            const angle = Math.random() * Math.PI * 2;
-            // Place in ocean zone
-            const startX = Math.random() * (W() - SIZE);
-            const surfY = waterSurfaceY(startX + SIZE/2);
-            bubbles.push({
-                el,
-                x: startX,
-                y: surfY + 20 + Math.random() * (H() - surfY - SIZE - 20),
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed
-            });
-        });
-        
-        function animate() {
-            bubbles.forEach((b, i) => {
-                b.x += b.vx;
-                b.y += b.vy;
-                
-                // Bounce off screen edges
-                if (b.x < 0) { b.x = 0; b.vx *= -1; }
-                if (b.x > W() - SIZE) { b.x = W() - SIZE; b.vx *= -1; }
-                
-                // Keep in curved ocean — surface follows bowl shape
-                const surfY = waterSurfaceY(b.x + SIZE/2);
-                if (b.y < surfY) { b.y = surfY; b.vy *= -1; }
-                if (b.y > H() - SIZE) { b.y = H() - SIZE; b.vy *= -1; }
-                
-                // Bounce off other bubbles (circle collision)
-                for (let j = i + 1; j < bubbles.length; j++) {
-                    const o = bubbles[j];
-                    const dx = (b.x + R) - (o.x + R);
-                    const dy = (b.y + R) - (o.y + R);
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const minDist = SIZE;
-                    
-                    if (dist < minDist && dist > 0) {
-                        // Normalize collision vector
-                        const nx = dx / dist;
-                        const ny = dy / dist;
-                        
-                        // Relative velocity
-                        const dvx = b.vx - o.vx;
-                        const dvy = b.vy - o.vy;
-                        const dvn = dvx * nx + dvy * ny;
-                        
-                        // Only resolve if moving toward each other
-                        if (dvn < 0) {
-                            b.vx -= dvn * nx;
-                            b.vy -= dvn * ny;
-                            o.vx += dvn * nx;
-                            o.vy += dvn * ny;
-                        }
-                        
-                        // Separate overlapping bubbles
-                        const overlap = (minDist - dist) / 2;
-                        b.x += nx * overlap;
-                        b.y += ny * overlap;
-                        o.x -= nx * overlap;
-                        o.y -= ny * overlap;
-                    }
-                }
-                
-                // Keep minimum speed
-                const spd = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
-                if (spd < 0.3) { b.vx *= 1.5; b.vy *= 1.5; }
-                if (spd > 3) { b.vx *= 0.9; b.vy *= 0.9; }
-                
-                // no wobble for perf
-                
-                b.el.style.left = b.x + 'px';
-                b.el.style.top = b.y + 'px';
-            });
-            
-            requestAnimationFrame(animate);
-        }
-        
-        animate();
         
         // Kiss button
         const kisses = ['kiss1.mp3','kiss2.mp3','kiss3.mp3','kiss4.mp3','kiss5.mp3','kiss6.mp3','kiss7.mp3','kiss8.mp3','kiss9.mp3','kiss10.mp3','kiss11.mp3'];
