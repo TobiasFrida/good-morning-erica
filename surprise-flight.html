@@ -15,17 +15,12 @@
         .bg-collage img { width: 100%; height: 100%; object-fit: cover; }
         .bg-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10,10,26,0.82); z-index: 1; backdrop-filter: blur(3px); }
         
-        /* Ocean */
-        .ocean { position: fixed; bottom: 0; left: 0; right: 0; height: 30vh; z-index: 4; pointer-events: none; }
-        .ocean-water { position: absolute; bottom: 0; left: 0; right: 0; height: 100%; background: linear-gradient(180deg, rgba(0,60,120,0.0) 0%, rgba(0,60,120,0.4) 10%, rgba(0,40,90,0.7) 40%, rgba(0,25,60,0.85) 100%); }
-        /* Wave SVG */
-        .wave { position: absolute; top: -20px; left: 0; width: 200%; height: 40px; animation: waveMove 8s linear infinite; }
-        .wave svg { width: 100%; height: 100%; }
-        .wave2 { animation-duration: 12s; animation-direction: reverse; top: -14px; opacity: 0.5; }
-        @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        /* Ocean - curved bowl shape */
+        .ocean { position: fixed; bottom: 0; left: 0; right: 0; height: 100vh; z-index: 4; pointer-events: none; }
+        .ocean svg.ocean-shape { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; }
         
         /* Light rays in water */
-        .ocean-rays { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; opacity: 0.15; }
+        .ocean-rays { position: fixed; bottom: 0; left: 0; right: 0; height: 30vh; overflow: hidden; opacity: 0.15; z-index: 4; pointer-events: none; }
         .ray { position: absolute; top: -10px; width: 40px; height: 120%; background: linear-gradient(180deg, rgba(100,200,255,0.5), transparent 70%); transform: rotate(5deg); filter: blur(10px); animation: rayShimmer 4s ease-in-out infinite alternate; }
         @keyframes rayShimmer { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
         
@@ -141,23 +136,29 @@
     </div>
     <div class="bg-overlay"></div>
     
-    <!-- OCEAN -->
+    <!-- OCEAN - curved bowl -->
     <div class="ocean">
-        <div class="wave">
-            <svg viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0,20 C150,0 350,40 600,20 C850,0 1050,40 1200,20 L1200,40 L0,40 Z" fill="rgba(0,60,120,0.5)"/></svg>
-        </div>
-        <div class="wave wave2">
-            <svg viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0,25 C200,10 400,35 600,20 C800,5 1000,35 1200,20 L1200,40 L0,40 Z" fill="rgba(0,40,90,0.3)"/></svg>
-        </div>
-        <div class="ocean-water"></div>
-        <div class="ocean-rays">
-            <div class="ray" style="left:10%; animation-delay:0s;"></div>
-            <div class="ray" style="left:25%; animation-delay:1s; width:30px;"></div>
-            <div class="ray" style="left:45%; animation-delay:2s;"></div>
-            <div class="ray" style="left:60%; animation-delay:0.5s; width:50px;"></div>
-            <div class="ray" style="left:78%; animation-delay:1.5s;"></div>
-            <div class="ray" style="left:90%; animation-delay:3s; width:35px;"></div>
-        </div>
+        <svg class="ocean-shape" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(0,60,140,0.3)"/>
+                    <stop offset="30%" stop-color="rgba(0,50,110,0.6)"/>
+                    <stop offset="100%" stop-color="rgba(0,20,50,0.9)"/>
+                </linearGradient>
+            </defs>
+            <!-- Bowl curve: high on sides, low in middle -->
+            <path d="M0,200 C0,200 0,350 50,450 C100,530 200,600 300,640 C400,670 450,680 500,685 C550,680 600,670 700,640 C800,600 900,530 950,450 C1000,350 1000,200 1000,200 L1000,1000 L0,1000 Z" fill="url(#waterGrad)"/>
+            <!-- Lighter inner wave -->
+            <path d="M0,250 C0,250 50,400 100,480 C180,560 280,620 380,655 C440,672 480,678 500,680 C520,678 560,672 620,655 C720,620 820,560 900,480 C950,400 1000,250 1000,250 L1000,1000 L0,1000 Z" fill="rgba(0,40,100,0.2)"/>
+        </svg>
+    </div>
+    <div class="ocean-rays">
+        <div class="ray" style="left:10%; animation-delay:0s;"></div>
+        <div class="ray" style="left:25%; animation-delay:1s; width:30px;"></div>
+        <div class="ray" style="left:45%; animation-delay:2s;"></div>
+        <div class="ray" style="left:60%; animation-delay:0.5s; width:50px;"></div>
+        <div class="ray" style="left:78%; animation-delay:1.5s;"></div>
+        <div class="ray" style="left:90%; animation-delay:3s; width:35px;"></div>
     </div>
     
     <div class="content">
@@ -218,8 +219,21 @@
         const SIZE = 85;
         const R = SIZE / 2;
         
-        // Ocean zone: bottom 30% of viewport
-        const oceanTop = () => H() * 0.70;
+        // Curved ocean boundary — matches the SVG bowl
+        // Returns the Y position of the water surface at a given X
+        function waterSurfaceY(x) {
+            const w = W();
+            const h = H();
+            // Normalize x to 0-1
+            const nx = x / w;
+            // Bowl curve: high on sides (20% from top), low in middle (68% from top)
+            const centerDip = 0.68;
+            const edgeHeight = 0.20;
+            // Parabolic curve
+            const t = (nx - 0.5) * 2; // -1 to 1
+            const curve = edgeHeight + (centerDip - edgeHeight) * (1 - t * t);
+            return h * curve;
+        }
         
         activities.forEach((a, i) => {
             const el = document.createElement('div');
@@ -230,11 +244,12 @@
             const speed = 0.3 + Math.random() * 0.5;
             const angle = Math.random() * Math.PI * 2;
             // Place in ocean zone
-            const ot = oceanTop();
+            const startX = Math.random() * (W() - SIZE);
+            const surfY = waterSurfaceY(startX + SIZE/2);
             bubbles.push({
                 el,
-                x: Math.random() * (W() - SIZE),
-                y: ot + Math.random() * (H() - ot - SIZE),
+                x: startX,
+                y: surfY + 20 + Math.random() * (H() - surfY - SIZE - 20),
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed
             });
@@ -247,12 +262,13 @@
                 b.x += b.vx;
                 b.y += b.vy;
                 
-                // Bounce off screen edges (left/right)
+                // Bounce off screen edges
                 if (b.x < 0) { b.x = 0; b.vx *= -1; }
                 if (b.x > W() - SIZE) { b.x = W() - SIZE; b.vx *= -1; }
                 
-                // Keep in ocean zone (bounce off surface and bottom)
-                if (b.y < ot) { b.y = ot; b.vy *= -1; }
+                // Keep in curved ocean — surface follows bowl shape
+                const surfY = waterSurfaceY(b.x + SIZE/2);
+                if (b.y < surfY) { b.y = surfY; b.vy *= -1; }
                 if (b.y > H() - SIZE) { b.y = H() - SIZE; b.vy *= -1; }
                 
                 // Bounce off other bubbles (circle collision)
@@ -324,7 +340,6 @@
         
         function animateDolphins() {
             dolphins.forEach(d => {
-                const waterTop = H() * 0.70;
                 const waterBot = H() - 40;
                 
                 d.x += d.vx;
@@ -332,6 +347,8 @@
                 // Bounce off edges
                 if (d.x < -30) { d.x = -30; d.vx = Math.abs(d.vx); }
                 if (d.x > W() + 10) { d.x = W() + 10; d.vx = -Math.abs(d.vx); }
+                
+                const waterTop = waterSurfaceY(d.x + 15);
                 
                 // Random jumping
                 d.jumpTimer++;
